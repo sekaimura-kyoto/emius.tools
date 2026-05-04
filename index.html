@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>六爻 納爻自動ツール iPhone対応版2</title>
+  <style>
+    :root{
+      --border:#555;
+      --head:#d9d9d9;
+      --subhead:#f3f3f3;
+      --yellow:#fff3a6;
+      --bg:#f5f3ee;
+      --red:#d33a20;
+      --blue:#2a70c9;
+      --muted:#8c8c8c;
+    }
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+      background:var(--bg);
+      color:#222;
+      font-size:14px;
+    }
+    .wrap{max-width:1220px;margin:0 auto;padding:18px;}
+    .card{background:#fff;border-radius:14px;padding:16px;margin:0 0 14px;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+    h1{margin:0 0 8px;font-size:22px;}
+    .note{margin:0;color:#666;font-size:13px;}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    .grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+    label{display:block;font-weight:700;font-size:13px;}
+    input,select,textarea{
+      box-sizing:border-box;width:100%;margin-top:5px;border:1px solid #bbb;border-radius:8px;padding:8px 9px;
+      font:inherit;background:var(--yellow);
+    }
+    textarea{min-height:72px;}
+    .full{grid-column:1/-1;}
+    .fig-layout{display:grid;grid-template-columns:minmax(0,1fr) 460px;gap:14px;align-items:start;}
+    .info-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px;font-size:13px;}
+    .info{background:#f4f4f4;border-radius:8px;padding:9px;}
+    .scroll{overflow-x:auto;}
+    table{border-collapse:collapse;min-width:840px;width:100%;table-layout:fixed;background:#fff;}
+    th,td{border:1px solid var(--border);padding:4px 3px;text-align:center;vertical-align:middle;height:52px;}
+    th{background:var(--head);font-weight:700;}
+    .sub th{background:var(--subhead);}
+    .vertical{writing-mode:horizontal-tb;text-orientation:mixed;letter-spacing:0;margin:0 auto;}
+    .red{color:var(--red);font-weight:700;}
+    .blue{color:var(--blue);font-weight:700;}
+    .muted{color:var(--muted);}
+    .yellow{background:var(--yellow);}
+    .line-select{
+      width:62px;text-align:center;font-size:18px;font-weight:800;padding:4px 2px;border-radius:6px;
+      border:1px solid #bbb;background:var(--yellow);
+    }
+    .role{display:inline-block;color:var(--blue);font-weight:700;font-size:12px;min-width:16px;text-align:center;}
+    .score{display:inline-block;font-size:11px;color:#555;min-width:34px;text-align:left;}
+    .astro{font-size:14px;}
+    .marker{display:inline-block;font-size:11px;color:#777;white-space:nowrap;min-width:42px;text-align:left;}
+    .specials{display:inline-flex;gap:3px;align-items:center;white-space:nowrap;font-size:11px;}
+    .sango{color:#e86aa8;font-weight:700;}
+    .andou{color:#132a63;font-weight:800;}
+    .renzoku{color:#2a70c9;font-weight:700;}
+    .hi-tomb{color:#d40000;font-weight:800;}
+    .tomb-source-orange{border-bottom:2px solid #f28c28;}
+    .tomb-source-brown{border-bottom:2px solid #8b5a2b;}
+
+    .cell-grid{display:grid;grid-template-columns:20px 42px 34px 1fr auto;align-items:center;column-gap:4px;justify-items:start;width:100%;}
+    .branch-text{display:inline-block;white-space:nowrap;font-weight:700;font-size:16px;}
+    .line-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+    .motion-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+    .motion-note{font-size:10px;color:#777;line-height:1.1;}
+    .arrow-note{font-size:12px;color:#999;line-height:1;}
+    .bottom-table{display:grid;grid-template-columns:1fr 1fr 1fr;min-width:840px;border:1px solid var(--border);border-top:0;text-align:center;}
+    .bottom-table>div{border-top:1px solid var(--border);border-right:1px solid var(--border);padding:10px;min-height:22px;}
+    .bottom-table>div:nth-child(3n){border-right:0;}
+    .bottom-head{background:var(--head);font-weight:700;}
+    .buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+    button,.filebtn{border:0;border-radius:8px;padding:9px 13px;cursor:pointer;background:#e8e8e8;font:inherit;font-weight:700;display:inline-block;}
+    .primary{background:#222;color:#fff;}
+    .danger{background:#ffe1e1;color:#b40000;}
+    .saved-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:8px;}
+    .hidden{display:none;}
+    .figure-box{border:1px solid #ddd;border-radius:10px;padding:8px;background:#fff;}
+    .figure-title{font-weight:700;margin-bottom:4px;}
+    .small{font-size:12px;color:#666;}
+    .svgtxt{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;}
+    @media (max-width:900px){
+      .fig-layout{grid-template-columns:1fr;}
+    }
+    @media (max-width:760px){
+      .grid,.grid5,.info-row{grid-template-columns:1fr;}
+      .wrap{padding:10px;}
+    }
+  </style>
+<script>
+window.onerror=function(msg, url, line, col, err){
+  var box=document.getElementById("errorBox");
+  if(box){
+    box.style.display="block";
+    box.textContent="エラー: "+msg+" / line:"+line;
+  }
+};
+</script>
+</head>
+<body>
+<div class="wrap"><div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
+  <div class="card">
+    <h1>六爻 納爻自動ツール iPhone対応版2</h1>
+    <p class="note">iPhoneでも使用できます。表は横長なので、iPhoneでは横スクロール前提です。黄色セルを入力すると、世応・六神・地支・六親・伏神・空亡・月破・月合・日破・日合・用/元/忌/仇・一部の発動種別を表示します。</p>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <label>鑑定年月日
+        <input id="readingDate" type="date">
+      </label>
+      <label>クライアント名
+        <input id="clientName" type="text">
+      </label>
+      <label class="full">占的
+        <input id="question" type="text">
+      </label>
+      <label>用神
+        <select id="useGod"></select>
+      </label>
+      <label class="full">メモ
+        <textarea id="memo"></textarea>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="fig-layout">
+      <div>
+        <div class="grid5">
+          <label>月建<select id="monthBranch"></select></label>
+          <label>日干<select id="dayStem"></select></label>
+          <label>日辰<select id="dayBranch"></select></label>
+          <label>空亡1<select id="void1"></select></label>
+          <label>空亡2<select id="void2"></select></label>
+        </div>
+        <div class="info-row">
+          <div class="info" id="monthInfo">月：</div>
+          <div class="info" id="dayInfo">日：</div>
+          <div class="info" id="voidInfo">空亡：</div>
+        </div>
+      </div>
+      <div class="figure-box">
+        <div class="figure-title">図1　五行・六親の関係</div>
+        <div id="figureArea"></div>
+        <div class="small">黒：六親／青：用・元・忌・仇／🌙月・☀️日／数字：五行点</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card scroll">
+    <table>
+      <colgroup>
+        <col style="width:58px">
+        <col style="width:128px">
+        <col style="width:44px">
+        <col style="width:78px">
+        <col style="width:220px">
+        <col style="width:44px">
+        <col style="width:78px">
+        <col style="width:145px">
+        <col style="width:44px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th rowspan="2"><div class="vertical">六神</div></th>
+          <th colspan="2"><div class="vertical">伏卦</div></th>
+          <th colspan="3"><div class="vertical">本卦</div></th>
+          <th colspan="3"><div class="vertical">変卦</div></th>
+        </tr>
+        <tr class="sub">
+          <th>地支</th><th>六親</th>
+          <th>卦爻</th><th>地支</th><th>六親</th>
+          <th>卦爻</th><th>地支</th><th>六親</th>
+        </tr>
+      </thead>
+      <tbody id="lineTable"></tbody>
+    </table>
+
+    <div class="bottom-table">
+      <div class="bottom-head">宮</div>
+      <div class="bottom-head">本卦</div>
+      <div class="bottom-head">変卦</div>
+      <div class="red" id="palaceCell"></div>
+      <div class="red" id="mainHexCell"></div>
+      <div class="red" id="changedHexCell"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>結果メモ・後日検証メモ
+      <textarea id="resultMemo"></textarea>
+    </label>
+    <div class="buttons">
+      <button class="primary" id="saveBtn">保存</button>
+      <button id="newBtn">新規</button>
+      <button id="exportBtn">JSON書き出し</button>
+      <label class="filebtn">JSON読み込み<input class="hidden" type="file" id="importInput" accept="application/json"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <strong>保存済み占例</strong>
+    <div id="savedList" class="small"></div>
+  </div>
+</div>
+
+<script>
+const LINE_OPTIONS=["--","ー","○","×"];
+const STEMS=["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const BRANCHES=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const VOID_PAIRS=[["子","丑"],["寅","卯"],["辰","巳"],["午","未"],["申","酉"],["戌","亥"]];
+const VOID_PAIR_BY_BRANCH={};
+VOID_PAIRS.forEach(function(pair){
+  pair.forEach(function(b){ VOID_PAIR_BY_BRANCH[b]=pair; });
+});
+
+function safeUuid(){
+  return "id_" + Date.now() + "_" + Math.floor(Math.random()*1000000);
+}
+
+function cloneObj(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function getProp(obj, path, fallback){
+  var cur=obj;
+  for(var i=0;i<path.length;i++){
+    if(cur==null) return fallback;
+    cur=cur[path[i]];
+  }
+  return cur==null ? fallback : cur;
+}
+const USE_GOD_OPTIONS=["世爻","応爻","妻財","官鬼","父母","子孫","兄弟"];
+const SIX_SPIRITS=["青龍","朱雀","勾陳","騰蛇","白虎","玄武"];
+const FIVE_ELEMENTS=["木","火","土","金","水"];
+const generateMap={木:"火",火:"土",土:"金",金:"水",水:"木"};
+const controlMap={木:"土",火:"金",土:"水",金:"木",水:"火"};
+const generatedByMap={火:"木",土:"火",金:"土",水:"金",木:"水"};
+const controlledByMap={土:"木",金:"火",水:"土",木:"金",火:"水"};
+const branchOrder={};
+BRANCHES.forEach(function(b,i){ branchOrder[b]=i; });
+
+const branchMaster={
+  子:{element:"水",conflict:"午",combine:"丑"}, 丑:{element:"土",conflict:"未",combine:"子"},
+  寅:{element:"木",conflict:"申",combine:"亥"}, 卯:{element:"木",conflict:"酉",combine:"戌"},
+  辰:{element:"土",conflict:"戌",combine:"酉"}, 巳:{element:"火",conflict:"亥",combine:"申"},
+  午:{element:"火",conflict:"子",combine:"未"}, 未:{element:"土",conflict:"丑",combine:"午"},
+  申:{element:"金",conflict:"寅",combine:"巳"}, 酉:{element:"金",conflict:"卯",combine:"辰"},
+  戌:{element:"土",conflict:"辰",combine:"卯"}, 亥:{element:"水",conflict:"巳",combine:"寅"}
+};
+const withElement=b=>b?b+(branchMaster[b]?.element||""):"";
+const parseBranch=s=>s?s.slice(0,1):"";
+const parseElement=s=>s?s.slice(1):"";
+
+const trigramBits={天:"111",沢:"110",火:"101",雷:"100",風:"011",水:"010",山:"001",地:"000"};
+const lowerNa={天:["子水","寅木","辰土"],沢:["巳火","卯木","丑土"],火:["卯木","丑土","亥水"],雷:["子水","寅木","辰土"],風:["丑土","亥水","酉金"],水:["寅木","辰土","午火"],山:["辰土","午火","申金"],地:["未土","巳火","卯木"]};
+const upperNa={天:["午火","申金","戌土"],沢:["亥水","酉金","未土"],火:["酉金","未土","巳火"],雷:["午火","申金","戌土"],風:["未土","巳火","卯木"],水:["申金","戌土","子水"],山:["戌土","子水","寅木"],地:["丑土","亥水","酉金"]};
+const hiddenByPalace={
+  乾金宮:["子水","寅木","辰土","午火","申金","戌土"],兌金宮:["巳火","卯木","丑土","亥水","酉金","未土"],
+  離火宮:["卯木","丑土","亥水","酉金","未土","巳火"],震木宮:["子水","寅木","辰土","午火","申金","戌土"],
+  巽木宮:["丑土","亥水","酉金","未土","巳火","卯木"],坎水宮:["寅木","辰土","午火","申金","戌土","子水"],
+  艮土宮:["辰土","午火","申金","戌土","子水","寅木"],坤土宮:["未土","巳火","卯木","丑土","亥水","酉金"]
+};
+const sixSpiritStart={甲:"青龍",乙:"青龍",丙:"朱雀",丁:"朱雀",戊:"勾陳",己:"騰蛇",庚:"白虎",辛:"白虎",壬:"玄武",癸:"玄武"};
+const relativeByPalaceElement={
+  木:{木:"兄",火:"子",土:"妻",金:"官",水:"父"},
+  火:{火:"兄",土:"子",金:"妻",水:"官",木:"父"},
+  土:{土:"兄",金:"子",水:"妻",木:"官",火:"父"},
+  金:{金:"兄",水:"子",木:"妻",火:"官",土:"父"},
+  水:{水:"兄",木:"子",火:"妻",土:"官",金:"父"}
+};
+const longToShortRelative={妻財:"妻",官鬼:"官",父母:"父",子孫:"子",兄弟:"兄"};
+
+const palaces=[
+  {palace:"乾金宮",element:"金",hexes:[["乾為天","天","天",[]],["天風姤","天","風",[]],["天山遯","天","山",[]],["天地否","天","地",["六合卦"]],["風地観","風","地",[]],["山地剥","山","地",[]],["火地晋","火","地",["遊魂卦"]],["火天大有","火","天",["帰魂卦"]]]},
+  {palace:"兌金宮",element:"金",hexes:[["兌為沢","沢","沢",[]],["沢水困","沢","水",["六合卦"]],["沢地萃","沢","地",[]],["沢山咸","沢","山",[]],["水山蹇","水","山",[]],["地山謙","地","山",[]],["雷山小過","雷","山",["遊魂卦"]],["雷沢帰妹","雷","沢",["帰魂卦"]]]},
+  {palace:"離火宮",element:"火",hexes:[["離為火","火","火",[]],["火山旅","火","山",["六合卦"]],["火風鼎","火","風",[]],["火水未済","火","水",[]],["山水蒙","山","水",[]],["風水渙","風","水",[]],["天水訟","天","水",["遊魂卦"]],["天火同人","天","火",["帰魂卦"]]]},
+  {palace:"震木宮",element:"木",hexes:[["震為雷","雷","雷",[]],["雷地予","雷","地",["六合卦"]],["雷水解","雷","水",[]],["雷風恒","雷","風",[]],["地風升","地","風",[]],["水風井","水","風",[]],["沢風大過","沢","風",["遊魂卦"]],["沢雷随","沢","雷",["帰魂卦"]]]},
+  {palace:"巽木宮",element:"木",hexes:[["巽為風","風","風",[]],["風天小畜","風","天",[]],["風火家人","風","火",[]],["風雷益","風","雷",[]],["天雷无妄","天","雷",["六冲卦"]],["火雷噬嗑","火","雷",[]],["山雷頤","山","雷",["遊魂卦"]],["山風蠱","山","風",["帰魂卦"]]]},
+  {palace:"坎水宮",element:"水",hexes:[["坎為水","水","水",[]],["水沢節","水","沢",["六合卦"]],["水雷屯","水","雷",[]],["水火既済","水","火",[]],["沢火革","沢","火",[]],["雷火豊","雷","火",[]],["地火明夷","地","火",["遊魂卦"]],["地水師","地","水",["帰魂卦"]]]},
+  {palace:"艮土宮",element:"土",hexes:[["艮為山","山","山",[]],["山火賁","山","火",["六合卦"]],["山天大畜","山","天",[]],["山沢損","山","沢",[]],["火沢睽","火","沢",[]],["天沢履","天","沢",[]],["風沢中孚","風","沢",["遊魂卦"]],["風山漸","風","山",["帰魂卦"]]]},
+  {palace:"坤土宮",element:"土",hexes:[["坤為地","地","地",[]],["地雷復","地","雷",["六合卦"]],["地沢臨","地","沢",[]],["地天泰","地","天",["六合卦"]],["雷天大壮","雷","天",["六冲卦"]],["沢天夬","沢","天",[]],["水天需","水","天",["遊魂卦"]],["水地比","水","地",["帰魂卦"]]]}
+];
+const shiByOrder=[6,1,2,3,4,5,4,3];
+const yingByShi={1:4,2:5,3:6,4:1,5:2,6:3};
+const hexagrams=[];
+palaces.forEach(function(p){
+  p.hexes.forEach(function(item, idx){
+    var name=item[0], upper=item[1], lower=item[2], tags=item[3];
+    hexagrams.push({
+      name:name,
+      upper:upper,
+      lower:lower,
+      palace:p.palace,
+      palaceElement:p.element,
+      orderInPalace:idx+1,
+      shiLine:shiByOrder[idx],
+      yingLine:yingByShi[shiByOrder[idx]],
+      tags:tags,
+      bits:trigramBits[lower]+trigramBits[upper]
+    });
+  });
+});
+const hexByBits={};
+hexagrams.forEach(function(h){ hexByBits[h.bits]=h; });
+
+function symbolToLine(symbol){
+  if(symbol==="--"||symbol==="×") return {yinYang:"yin",bit:"0",isMoving:symbol==="×"};
+  if(symbol==="ー"||symbol==="○") return {yinYang:"yang",bit:"1",isMoving:symbol==="○"};
+  return {yinYang:null,bit:"",isMoving:false};
+}
+function changedSymbol(symbol){ if(symbol==="○")return "--"; if(symbol==="×")return "ー"; return ""; }
+function getRelative(palaceElement,bwe){ return ((relativeByPalaceElement[palaceElement]||{})[parseElement(bwe)])||""; }
+function buildNaLines(hex){ return hex?[...lowerNa[hex.lower],...upperNa[hex.upper]]:[]; }
+function getMarkers(bwe,cal){
+  const b=parseBranch(bwe); if(!b)return [];
+  const m=[]; if(cal.voidBranches.includes(b))m.push("空");
+  const month=cal.monthBranch, day=cal.dayBranch;
+  if(month&&(branchMaster[month] && branchMaster[month].conflict)===b)m.push("月破");
+  if(month&&(branchMaster[month] && branchMaster[month].combine)===b)m.push("月合");
+  if(day&&(branchMaster[day] && branchMaster[day].conflict)===b)m.push("日破");
+  if(day&&(branchMaster[day] && branchMaster[day].combine)===b)m.push("日合");
+  return m;
+}
+function sameElementProgress(mainB,changedB){
+  const i=branchOrder[mainB], j=branchOrder[changedB];
+  if(i==null||j==null||i===j) return "";
+  // 十二支の循環順で判定。
+  // 例：辰→未は進神、戌→丑は退神。
+  const forward = (j - i + 12) % 12;
+  const backward = (i - j + 12) % 12;
+  return forward <= backward ? "進神" : "退神";
+}
+function computeMotionKinds(mainBranch, changedBranch, position, mainNa){
+  if(!mainBranch || !changedBranch) return [];
+  const kinds=[];
+  const mb=parseBranch(mainBranch), cb=parseBranch(changedBranch);
+  const me=parseElement(mainBranch), ce=parseElement(changedBranch);
+  if(mb===cb) kinds.push("伏吟");
+  if(branchMaster[mb]?.conflict===cb) kinds.push("反吟");
+  if(generateMap[ce]===me) kinds.push("回頭生");
+  if(controlMap[ce]===me) kinds.push("回頭剋");
+  if(me===ce && mb!==cb) kinds.push(sameElementProgress(mb,cb));
+  const idx=position-1;
+  const above=mainNa.slice(idx+1).includes(changedBranch);
+  const below=mainNa.slice(0,idx).includes(changedBranch);
+  if(above) kinds.push("↖︎");
+  if(below) kinds.push("↙︎");
+  return [...new Set(kinds.filter(Boolean))];
+}
+function buildDisplayLines(inputSymbols,cal){
+  const baseBits=inputSymbols.map(s=>symbolToLine(s).bit).join("");
+  const changedBits=inputSymbols.map(s=>{const l=symbolToLine(s); return l.isMoving?(l.bit==="1"?"0":"1"):l.bit;}).join("");
+  const mainHex=hexByBits[baseBits];
+  const hasMoving=inputSymbols.some(s=>symbolToLine(s).isMoving);
+  const changedHex=hasMoving?hexByBits[changedBits]:null;
+  if(!mainHex)return {mainHex:null,changedHex:null,lines:[]};
+  const mainNa=buildNaLines(mainHex), changedNa=changedHex?buildNaLines(changedHex):[];
+  const mainElements=new Set(mainNa.map(parseElement));
+  const hiddenNa=hiddenByPalace[mainHex.palace]||[];
+  const start=SIX_SPIRITS.indexOf(sixSpiritStart[cal.dayStem]||"青龍");
+  const labels=["","初爻","二爻","三爻","四爻","五爻","上爻"];
+  const lines=inputSymbols.map((symbol,idx)=>{
+    const pos=idx+1, line=symbolToLine(symbol), mainBranch=mainNa[idx], hiddenBranch=hiddenNa[idx];
+    const hiddenElement=parseElement(hiddenBranch);
+    const showHidden=hiddenBranch&&!mainElements.has(hiddenElement);
+    const moving=line.isMoving, changedBranch=moving&&changedHex?changedNa[idx]:"";
+    return {
+      position:pos,label:labels[pos],sixSpirit:SIX_SPIRITS[(start+idx)%SIX_SPIRITS.length],
+      hiddenSpirit:showHidden?{branchWithElement:hiddenBranch,sixRelative:getRelative(mainHex.palaceElement,hiddenBranch),markers:getMarkers(hiddenBranch,cal)}:{branchWithElement:"",sixRelative:"",markers:[]},
+      mainLine:{symbol,yinYang:line.yinYang,isMoving:moving,shiOrYing:pos===mainHex.shiLine?"世":pos===mainHex.yingLine?"応":"",branchWithElement:mainBranch,sixRelative:getRelative(mainHex.palaceElement,mainBranch),markers:getMarkers(mainBranch,cal)},
+      changedLine:moving?{symbol:changedSymbol(symbol),branchWithElement:changedBranch,sixRelative:getRelative(mainHex.palaceElement,changedBranch),markers:getMarkers(changedBranch,cal),motions:computeMotionKinds(mainBranch,changedBranch,pos,mainNa)}:{symbol:"",branchWithElement:"",sixRelative:"",markers:[],motions:[]}
+    };
+  });
+  return {mainHex,changedHex,lines};
+}
+function uuid(){return safeUuid();}
+function blankRecord(){
+  return {id:uuid(),readingDate:new Date().toISOString().slice(0,10),clientName:"",question:"",useGod:"世爻",memo:"",resultMemo:"",calendar:{monthBranch:"",dayStem:"",dayBranch:"",voidBranches:["",""]},inputSymbols:["--","--","--","--","--","--"],updatedAt:new Date().toISOString()};
+}
+let record=blankRecord();
+let saved=[];
+function fillSelect(id,options,withBlank){
+  if(withBlank===undefined) withBlank=true;
+  var el=document.getElementById(id);
+  var html=withBlank?'<option value="">選択</option>':'';
+  for(var i=0;i<options.length;i++){
+    var o=options[i];
+    html += '<option value="'+o+'">'+o+'</option>';
+  }
+  el.innerHTML=html;
+}
+function cellHtml(role,branchWithElement,markers,scoreCtx,extras=[],sourceClass=""){
+  const element = parseElement(branchWithElement);
+  const score = scoreText(element, scoreCtx);
+  const markerText = (markers && markers.length) ? markers.join(" ") : "";
+  const specialHtml = (extras && extras.length) ? `<span class="specials">${extras.map(e=>`<span class="${e.cls||""}" style="${e.style||""}">${e.text}</span>`).join("")}</span>` : "";
+  return `<span class="cell-grid">
+    <span class="role">${role||""}</span>
+    <span class="branch-text ${sourceClass||""}">${branchWithElement||""}</span>
+    <span class="score">${score||""}</span>
+    <span class="marker">${markerText}</span>
+    ${specialHtml}
+  </span>`;
+}
+function loadStorage(){try{saved=JSON.parse(localStorage.getItem("liuyao_records_v2")||"[]");}catch(e){saved=[];}}
+function saveStorage(){localStorage.setItem("liuyao_records_v2",JSON.stringify(saved));}
+
+function getUseContext(computed){
+  const hex=computed.mainHex;
+  if(!hex) return {useElement:"", useRelative:"", useMode:"", palaceElement:""};
+  const palaceElement=hex.palaceElement;
+  let useElement="", useRelative="", useMode="";
+  if(record.useGod==="世爻"){
+    const line=computed.lines.find(l=>l.position===hex.shiLine);
+    useElement=parseElement((line && line.mainLine && line.mainLine.branchWithElement)||"");
+    useRelative=(line && line.mainLine && line.mainLine.sixRelative)||"";
+    useMode="shi";
+  }else if(record.useGod==="応爻"){
+    const line=computed.lines.find(l=>l.position===hex.yingLine);
+    useElement=parseElement((line && line.mainLine && line.mainLine.branchWithElement)||"");
+    useRelative=(line && line.mainLine && line.mainLine.sixRelative)||"";
+    useMode="ying";
+  }else{
+    useRelative=longToShortRelative[record.useGod] || "";
+    const relMap=relativeByPalaceElement[palaceElement] || {};
+    useElement=Object.keys(relMap).find(el=>relMap[el]===useRelative) || "";
+    useMode="relative";
+  }
+  const yuanElement=generatedByMap[useElement] || "";
+  const jiElement=controlledByMap[useElement] || "";
+  const chouElement=generatedByMap[jiElement] || "";
+  return {useElement, useRelative, useMode, palaceElement, yuanElement, jiElement, chouElement};
+}
+
+function addElementScore(scores, element){
+  if(!element) return;
+
+  function plus(el){
+    if(!el) return;
+    scores[el].plus += 1;
+    scores[el].net += 1;
+  }
+
+  function minus(el){
+    if(!el) return;
+    scores[el].minus += 1;
+    scores[el].net -= 1;
+  }
+
+  plus(element);
+
+  const generated = generateMap[element];
+  plus(generated);
+
+  const controlled = controlMap[element];
+  minus(controlled);
+}
+
+function getElementScores(cal){
+  const scores = {
+    木:{plus:0, minus:0, net:0},
+    火:{plus:0, minus:0, net:0},
+    土:{plus:0, minus:0, net:0},
+    金:{plus:0, minus:0, net:0},
+    水:{plus:0, minus:0, net:0}
+  };
+  const monthElement = (branchMaster[cal.monthBranch] && branchMaster[cal.monthBranch].element) || "";
+  const dayElement = (branchMaster[cal.dayBranch] && branchMaster[cal.dayBranch].element) || "";
+  addElementScore(scores, monthElement);
+  addElementScore(scores, dayElement);
+  return {scores, monthElement, dayElement};
+}
+
+function scoreText(element, scoreCtx){
+  const data = (scoreCtx && scoreCtx.scores && scoreCtx.scores[element]);
+  if(!data) return "";
+  if(data.net === 0){
+    // 何の影響もない0は空欄。
+    // +と-が両方入って相殺された0だけ「±0」と表示する。
+    return (data.plus > 0 && data.minus > 0) ? "±0" : "";
+  }
+  return data.net > 0 ? `+${data.net}` : `${data.net}`;
+}
+function getRoleTag(kind, data, position, computed, ctx){
+  if(!(data && data.branchWithElement)) return "";
+  const element=parseElement(data.branchWithElement);
+  if(!ctx.useElement) return "";
+  if(record.useGod==="世爻" && kind==="main" && position===computed.mainHex.shiLine) return "用";
+  if(record.useGod==="応爻" && kind==="main" && position===computed.mainHex.yingLine) return "用";
+  if(ctx.useMode==="relative" && data.sixRelative===ctx.useRelative) return "用";
+  if(element===ctx.yuanElement) return "元";
+  if(element===ctx.jiElement) return "忌";
+  if(element===ctx.chouElement) return "仇";
+  return "";
+}
+function renderFigure(computed, ctx, scoreCtx){
+  const palaceElement=(computed.mainHex && computed.mainHex.palaceElement);
+  if(!palaceElement){
+    document.getElementById("figureArea").innerHTML='<div class="small">卦が確定すると図を表示します。</div>';
+    return;
+  }
+  const relMap=relativeByPalaceElement[palaceElement];
+
+  // 五芒星の形を崩さない固定座標
+  const pts={
+    木:[230,118], 火:[338,200], 土:[290,318], 金:[170,318], 水:[122,200]
+  };
+  const order=["木","火","土","金","水"];
+  const nodeRole = el => {
+    if(!ctx.useElement) return "";
+    if(el===ctx.useElement) return "用";
+    if(el===ctx.yuanElement) return "元";
+    if(el===ctx.jiElement) return "忌";
+    if(el===ctx.chouElement) return "仇";
+    return "";
+  };
+
+  const linesCircle = [["木","火"],["火","土"],["土","金"],["金","水"],["水","木"]]
+    .map(([a,b])=>`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="#222" stroke-width="2" marker-end="url(#arr)"/>`).join("");
+  const star = [["木","土"],["土","水"],["水","火"],["火","金"],["金","木"]]
+    .map(([a,b])=>`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="#222" stroke-width="1.8" marker-end="url(#arr2)"/>`).join("");
+
+  const nodes = order.map(el=>{
+    const [x,y]=pts[el];
+    const role=nodeRole(el);
+    const rel=relMap[el]||"";
+
+    // 六親は丸の近く。☀️/🌙・点数・用/元/忌/仇 は横並び。
+    const cfg = {
+      木:{rel:[36,7], astro:[-22,-38], score:[0,-38], role:[22,-38]},
+      火:{rel:[0,-26], astro:[34,7], score:[56,7], role:[78,7]},
+      土:{rel:[36,7], astro:[-16,38], score:[0,38], role:[22,38]},
+      金:{rel:[-36,7], astro:[-16,38], score:[0,38], role:[22,38]},
+      水:{rel:[0,-26], astro:[-78,7], score:[-56,7], role:[-34,7]}
+    }[el];
+
+    const score = scoreText(el, scoreCtx);
+    const astro = `${scoreCtx.monthElement===el?"🌙":""}${scoreCtx.dayElement===el?"☀️":""}`;
+    const scoreLabel = score ? `${score}` : "";
+    return `
+      <circle cx="${x}" cy="${y}" r="20" fill="#fff" stroke="#222" stroke-width="2"></circle>
+      <text x="${x}" y="${y+7}" text-anchor="middle" class="svgtxt" font-size="20">${el}</text>
+      <text x="${x+cfg.rel[0]}" y="${y+cfg.rel[1]}" text-anchor="middle" class="svgtxt" font-size="24" fill="#222">${rel}</text>
+      ${astro?`<text x="${x+cfg.astro[0]}" y="${y+cfg.astro[1]}" text-anchor="middle" class="svgtxt astro" font-size="24">${astro}</text>`:""}
+      ${scoreLabel?`<text x="${x+cfg.score[0]}" y="${y+cfg.score[1]}" text-anchor="middle" class="svgtxt" font-size="22" fill="#555">${scoreLabel}</text>`:""}
+      ${role?`<text x="${x+cfg.role[0]}" y="${y+cfg.role[1]}" text-anchor="middle" class="svgtxt" font-size="20" fill="#2a70c9">${role}</text>`:""}
+    `;
+  }).join("");
+
+  document.getElementById("figureArea").innerHTML = `
+    <svg width="100%" viewBox="0 0 470 430" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#222"/>
+        </marker>
+        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#222"/>
+        </marker>
+      </defs>
+      ${linesCircle}
+      ${star}
+      ${nodes}
+    </svg>`;
+}
+function bindInputs(){
+  ["readingDate","clientName","question","useGod","memo","resultMemo"].forEach(id=>{
+    document.getElementById(id).addEventListener("input",e=>{record[id]=e.target.value; render();});
+  });
+  document.getElementById("monthBranch").addEventListener("input",e=>{record.calendar.monthBranch=e.target.value; render();});
+  document.getElementById("dayStem").addEventListener("input",e=>{record.calendar.dayStem=e.target.value; render();});
+  document.getElementById("dayBranch").addEventListener("input",e=>{record.calendar.dayBranch=e.target.value; render();});
+  document.getElementById("void1").addEventListener("input",e=>{setVoidPair(e.target.value); render();});
+  document.getElementById("void2").addEventListener("input",e=>{setVoidPair(e.target.value); render();});
+  document.getElementById("saveBtn").onclick=()=>{record.updatedAt=new Date().toISOString(); saved=[cloneObj(record),...saved.filter(r=>r.id!==record.id)]; saveStorage(); renderSaved(); alert("保存しました");};
+  document.getElementById("newBtn").onclick=()=>{record=blankRecord(); render();};
+  document.getElementById("exportBtn").onclick=()=>{const blob=new Blob([JSON.stringify(saved,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`六爻占例バックアップ_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);};
+  document.getElementById("importInput").onchange=e=>{const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{try{const data=JSON.parse(String(reader.result)); if(!Array.isArray(data))throw new Error(); saved=data; saveStorage(); renderSaved(); alert("読み込みました");}catch(err){alert("JSONを読み込めませんでした");}}; reader.readAsText(file);};
+}
+
+const threeHarmonyGroups=[
+  {element:"木", center:"卯", members:["亥","卯","未"]},
+  {element:"火", center:"午", members:["寅","午","戌"]},
+  {element:"水", center:"子", members:["申","子","辰"]},
+  {element:"金", center:"酉", members:["巳","酉","丑"]}
+];
+const tombRules={
+  丑:{elements:["金"]},
+  辰:{elements:["水","土"]},
+  未:{elements:["木"]},
+  戌:{elements:["火"]}
+};
+const tombColors=[
+  {name:"orange", color:"#f28c28", sourceClass:"tomb-source-orange"},
+  {name:"brown", color:"#8b5a2b", sourceClass:"tomb-source-brown"}
+];
+
+function setVoidPair(selected){
+  const pair=VOID_PAIR_BY_BRANCH[selected];
+  if(!pair) return;
+  record.calendar.voidBranches=[pair[0],pair[1]];
+}
+
+function branchAppearsInMainOrHidden(branch, lines){
+  return lines.some(l => parseBranch(l.mainLine.branchWithElement)===branch || parseBranch(l.hiddenSpirit.branchWithElement)===branch);
+}
+
+function getThreeHarmonyExtras(line, lines){
+  const branch=parseBranch(line.mainLine.branchWithElement);
+  if(!branch) return [];
+  const group=threeHarmonyGroups.find(g=>g.center===branch);
+  if(!group) return [];
+  const partners=group.members.filter(b=>b!==branch);
+  const foundCount=partners.filter(b=>branchAppearsInMainOrHidden(b, lines)).length;
+  if(foundCount===2){
+    return [{text: line.mainLine.isMoving ? "完全三合局" : "三合", cls:"sango"}];
+  }
+  if(line.mainLine.isMoving && foundCount===1){
+    return [{text:"半局", cls:"sango"}];
+  }
+  return [];
+}
+
+function getTombContext(lines){
+  const mainTombSources=lines
+    .filter(l=>tombRules[parseBranch(l.mainLine.branchWithElement)])
+    .slice(0,2)
+    .map((l,idx)=>({
+      position:l.position,
+      branch:parseBranch(l.mainLine.branchWithElement),
+      branchWithElement:l.mainLine.branchWithElement,
+      rule:tombRules[parseBranch(l.mainLine.branchWithElement)],
+      ...tombColors[idx]
+    }));
+
+  return {mainTombSources};
+}
+
+function isTombTargetForSource(branchWithElement, source){
+  if(!branchWithElement || !source) return false;
+}
+
+function isTombTarget(branchWithElement, source){
+  if(!branchWithElement || !source) return false;
+  const element=parseElement(branchWithElement);
+  return source.rule.elements.includes(element);
+}
+
+function getTombExtras(data, position, tombCtx, kind){
+  const extras=[];
+  const branchWithElement=(data && data.branchWithElement) || "";
+  if(!branchWithElement) return extras;
+
+  for(const source of tombCtx.mainTombSources){
+    // 自分自身の本卦墓支には「入墓」を付けず、下線だけにする
+    if(kind==="main" && position===source.position) continue;
+    if(isTombTarget(branchWithElement, source)){
+      extras.push({text:"入墓", cls:"", style:`color:${source.color};font-weight:700;`});
+    }
+  }
+  return extras;
+}
+
+function getTombSourceClass(position, tombCtx, kind){
+  if(kind!=="main") return "";
+  const source=tombCtx.mainTombSources.find(s=>s.position===position);
+  return (source && source.sourceClass) || "";
+}
+
+function dayTombTargetsElement(dayBranch, element){
+  const rule=tombRules[dayBranch];
+  if(!rule || !element) return false;
+  return rule.elements.includes(element);
+}
+
+function getDayTombExtras(data, isUseGod, cal){
+  if(!isUseGod || !(data && data.branchWithElement)) return [];
+  const dayBranch=cal.dayBranch;
+  if(!dayTombTargetsElement(dayBranch, parseElement(data.branchWithElement))) return [];
+  return [{text:"日入墓", cls:"hi-tomb"}];
+}
+
+function getDarkMoveExtras(data, cal, isMain){
+  if(!isMain || !(data && data.branchWithElement)) return [];
+  const day=cal.dayBranch;
+  const month=cal.monthBranch;
+  if(!day || !month) return [];
+  const dayBreak=(branchMaster[day] && branchMaster[day].conflict);
+  const targetBranch=parseBranch(data.branchWithElement);
+  if(targetBranch!==dayBreak) return [];
+  const monthElement=branchMaster[month]?.element;
+  const targetElement=branchMaster[targetBranch]?.element;
+  if(generateMap[monthElement]===targetElement){
+    return [{text:"暗動", cls:"andou"}];
+  }
+  return [];
+}
+
+function getContinuousGenerationExtras(data, isUseGod, computed, ctx, scoreCtx){
+  if(!isUseGod || !(data && data.branchWithElement)) return [];
+  const element=parseElement(data.branchWithElement);
+  const scoreData=(scoreCtx && scoreCtx.scores && scoreCtx.scores[element]);
+  const net=((scoreData && scoreData.net)!=null ? scoreData.net : 0);
+  const markers=data.markers || [];
+  if(net < 0) return [];
+  if(markers.includes("空") || markers.includes("月破")) return [];
+
+  const hasMovingYuan=computed.lines.some(l=>l.mainLine.isMoving && parseElement(l.mainLine.branchWithElement)===ctx.yuanElement);
+  const hasMovingJi=computed.lines.some(l=>l.mainLine.isMoving && parseElement(l.mainLine.branchWithElement)===ctx.jiElement);
+  if(hasMovingYuan && hasMovingJi){
+    return [{text:"<連続相生>", cls:"renzoku"}];
+  }
+  return [];
+}
+
+function render(){
+  ["readingDate","clientName","question","useGod","memo","resultMemo"].forEach(id=>document.getElementById(id).value=record[id]||"");
+  document.getElementById("monthBranch").value=record.calendar.monthBranch;
+  document.getElementById("dayStem").value=record.calendar.dayStem;
+  document.getElementById("dayBranch").value=record.calendar.dayBranch;
+  document.getElementById("void1").value=record.calendar.voidBranches[0];
+  document.getElementById("void2").value=record.calendar.voidBranches[1];
+  const m=record.calendar.monthBranch, d=record.calendar.dayBranch;
+  document.getElementById("monthInfo").textContent=m?`月：${withElement(m)} / 月破 ${withElement(branchMaster[m].conflict)} / 月合 ${withElement(branchMaster[m].combine)}`:"月：";
+  document.getElementById("dayInfo").textContent=d?`日：${record.calendar.dayStem||""}${withElement(d)} / 日破 ${withElement(branchMaster[d].conflict)} / 日合 ${withElement(branchMaster[d].combine)}`:"日：";
+  document.getElementById("voidInfo").textContent=`空亡：${record.calendar.voidBranches.filter(Boolean).map(withElement).join("・")}`;
+
+  const computed=buildDisplayLines(record.inputSymbols,record.calendar);
+  const useCtx=getUseContext(computed);
+  const scoreCtx=getElementScores(record.calendar);
+  const tombCtx=getTombContext(computed.lines);
+  const rows=[...computed.lines].reverse().map(line=>{
+    const idx=line.position-1;
+    const hiddenRole=getRoleTag("hidden", line.hiddenSpirit, line.position, computed, useCtx);
+    const mainRole=getRoleTag("main", line.mainLine, line.position, computed, useCtx);
+    const changedRole=getRoleTag("changed", line.changedLine, line.position, computed, useCtx);
+    const hiddenIsUse=hiddenRole==="用";
+    const mainIsUse=mainRole==="用";
+    const changedIsUse=changedRole==="用";
+    const hiddenExtras=[
+      ...getTombExtras(line.hiddenSpirit, line.position, tombCtx, "hidden"),
+      ...getDayTombExtras(line.hiddenSpirit, hiddenIsUse, record.calendar),
+      ...getContinuousGenerationExtras(line.hiddenSpirit, hiddenIsUse, computed, useCtx, scoreCtx)
+    ];
+    const mainExtras=[
+      ...getThreeHarmonyExtras(line, computed.lines),
+      ...getTombExtras(line.mainLine, line.position, tombCtx, "main"),
+      ...getDayTombExtras(line.mainLine, mainIsUse, record.calendar),
+      ...getDarkMoveExtras(line.mainLine, record.calendar, true),
+      ...getContinuousGenerationExtras(line.mainLine, mainIsUse, computed, useCtx, scoreCtx)
+    ];
+    const changedExtras=[
+      ...getDayTombExtras(line.changedLine, changedIsUse, record.calendar)
+    ];
+    const hiddenSourceClass=getTombSourceClass(line.position, tombCtx, "hidden");
+    const mainSourceClass=getTombSourceClass(line.position, tombCtx, "main");
+    const changedSourceClass=getTombSourceClass(line.position, tombCtx, "changed");
+    const motionText = line.changedLine.motions.filter(m=>!m.startsWith("↖")&&!m.startsWith("↙")).join(" ");
+    const arrowText = line.changedLine.motions.filter(m=>m.startsWith("↖")||m.startsWith("↙")).join(" ");
+    return `<tr>
+      <td class="red"><div class="vertical">${line.sixSpirit}</div></td>
+      <td>${cellHtml(hiddenRole,line.hiddenSpirit.branchWithElement,line.hiddenSpirit.markers,scoreCtx,hiddenExtras,hiddenSourceClass)}</td>
+      <td>${line.hiddenSpirit.sixRelative}</td>
+      <td class="yellow">
+        <div class="line-cell">
+          <select class="line-select" data-idx="${idx}">${LINE_OPTIONS.map(o=>`<option value="${o}" ${record.inputSymbols[idx]===o?"selected":""}>${o}</option>`).join("")}</select>
+          ${line.mainLine.shiOrYing?`<div class="red">${line.mainLine.shiOrYing}</div>`:""}
+        </div>
+      </td>
+      <td>${cellHtml(mainRole,line.mainLine.branchWithElement,line.mainLine.markers,scoreCtx,mainExtras,mainSourceClass)}</td>
+      <td>${line.mainLine.sixRelative}</td>
+      <td>
+        <div class="motion-wrap">
+          ${motionText?`<div class="motion-note">${motionText}</div>`:""}
+          <div style="font-size:18px;font-weight:800">${line.changedLine.symbol||""}</div>
+          ${arrowText?`<div class="arrow-note">${arrowText}</div>`:""}
+        </div>
+      </td>
+      <td>${cellHtml(changedRole,line.changedLine.branchWithElement,line.changedLine.markers,scoreCtx,changedExtras,changedSourceClass)}</td>
+      <td>${line.changedLine.sixRelative}</td>
+    </tr>`;
+  }).join("");
+  document.getElementById("lineTable").innerHTML=rows;
+  document.querySelectorAll(".line-select").forEach(sel=>sel.addEventListener("change",e=>{record.inputSymbols[Number(e.target.dataset.idx)]=e.target.value; render();}));
+  document.getElementById("palaceCell").textContent=(computed.mainHex && computed.mainHex.palace)||"";
+  document.getElementById("mainHexCell").textContent=computed.mainHex?computed.mainHex.name+(computed.mainHex.tags.length?`（${computed.mainHex.tags.join("・")}）`:""):"";
+  document.getElementById("changedHexCell").textContent=computed.changedHex?computed.changedHex.name+(computed.changedHex.tags.length?`（${computed.changedHex.tags.join("・")}）`:""):"";
+  renderFigure(computed, useCtx, scoreCtx);
+  renderSaved();
+}
+function renderSaved(){
+  const list=document.getElementById("savedList");
+  if(!saved.length){list.innerHTML='<p>まだ保存済み占例はありません。</p>'; return;}
+  list.innerHTML=saved.map(r=>`<div class="saved-item"><div><strong>${r.readingDate||""}　${r.clientName||"無名"}</strong><br>${r.question||"占的未入力"}</div><div><button data-load="${r.id}">開く</button> <button class="danger" data-del="${r.id}">削除</button></div></div>`).join("");
+  list.querySelectorAll("[data-load]").forEach(b=>b.onclick=()=>{const f=saved.find(r=>r.id===b.dataset.load); if(f){record=cloneObj(f); render();}});
+  list.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{saved=saved.filter(r=>r.id!==b.dataset.del); saveStorage(); renderSaved();});
+}
+fillSelect("useGod",USE_GOD_OPTIONS,false);
+["monthBranch","dayBranch","void1","void2"].forEach(id=>fillSelect(id,BRANCHES,true));
+fillSelect("dayStem",STEMS,true);
+loadStorage();
+bindInputs();
+render();
+</script>
+</body>
+</html>
