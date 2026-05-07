@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>六爻 納爻自動ツール iPhone対応版2</title>
+  <title>六爻 納爻自動ツール メモ欄追加版</title>
   <style>
     :root{
       --border:#555;
@@ -48,6 +48,7 @@
     .blue{color:var(--blue);font-weight:700;}
     .muted{color:var(--muted);}
     .yellow{background:var(--yellow);}
+    .row-memo{width:100%;min-height:34px;height:38px;margin:0;background:#fffef0;border:1px solid #ccc;border-radius:6px;padding:4px;font-size:12px;resize:vertical;}
     .line-select{
       width:62px;text-align:center;font-size:18px;font-weight:800;padding:4px 2px;border-radius:6px;
       border:1px solid #bbb;background:var(--yellow);
@@ -79,6 +80,17 @@
     .primary{background:#222;color:#fff;}
     .danger{background:#ffe1e1;color:#b40000;}
     .saved-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:8px;}
+    .direction-table-wrap{margin-top:16px;overflow-x:auto;}
+    .direction-table{min-width:980px;font-size:12px;}
+    .direction-table th,.direction-table td{height:auto;padding:7px 5px;}
+    .meaning-box{margin-top:16px;border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff;}
+    .meaning-box h2{margin:0 0 10px;font-size:18px;}
+    .hex-meaning-area{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .hex-meaning-card{border:1px solid #ddd;border-radius:10px;padding:10px;background:#fafafa;}
+    .hex-meaning-card h3{margin:0 0 8px;color:#b40000;}
+    .meaning-section{margin:8px 0;}
+    .meaning-section strong{display:block;color:#333;margin-bottom:2px;}
+    .meaning-section p{margin:0;line-height:1.65;}
     .hidden{display:none;}
     .figure-box{border:1px solid #ddd;border-radius:10px;padding:8px;background:#fff;}
     .figure-title{font-weight:700;margin-bottom:4px;}
@@ -105,7 +117,7 @@ window.onerror=function(msg, url, line, col, err){
 <body>
 <div class="wrap"><div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
   <div class="card">
-    <h1>六爻 納爻自動ツール iPhone対応版2</h1>
+    <h1>六爻 納爻自動ツール メモ欄追加版</h1>
     <p class="note">iPhoneでも使用できます。表は横長なので、iPhoneでは横スクロール前提です。黄色セルを入力すると、世応・六神・地支・六親・伏神・空亡・月破・月合・日破・日合・用/元/忌/仇・一部の発動種別を表示します。</p>
   </div>
 
@@ -122,6 +134,9 @@ window.onerror=function(msg, url, line, col, err){
       </label>
       <label>用神
         <select id="useGod"></select>
+      </label>
+      <label>ジャンル
+        <select id="genre"></select>
       </label>
       <label class="full">メモ
         <textarea id="memo"></textarea>
@@ -157,14 +172,15 @@ window.onerror=function(msg, url, line, col, err){
     <table>
       <colgroup>
         <col style="width:58px">
-        <col style="width:128px">
+        <col style="width:104px">
         <col style="width:44px">
         <col style="width:78px">
         <col style="width:220px">
         <col style="width:44px">
         <col style="width:78px">
-        <col style="width:145px">
+        <col style="width:110px">
         <col style="width:44px">
+        <col style="width:180px">
       </colgroup>
       <thead>
         <tr>
@@ -172,6 +188,7 @@ window.onerror=function(msg, url, line, col, err){
           <th colspan="2"><div class="vertical">伏卦</div></th>
           <th colspan="3"><div class="vertical">本卦</div></th>
           <th colspan="3"><div class="vertical">変卦</div></th>
+          <th rowspan="2">メモ</th>
         </tr>
         <tr class="sub">
           <th>地支</th><th>六親</th>
@@ -189,7 +206,19 @@ window.onerror=function(msg, url, line, col, err){
       <div class="red" id="palaceCell"></div>
       <div class="red" id="mainHexCell"></div>
       <div class="red" id="changedHexCell"></div>
+    
+    <div class="direction-table-wrap">
+      <table class="direction-table">
+        <tr><th>子水</th><th>丑土</th><th>寅木</th><th>卯木</th><th>辰土</th><th>巳火</th><th>午火</th><th>未土</th><th>申金</th><th>酉金</th><th>戌土</th><th>亥水</th></tr>
+        <tr><td>北</td><td>北北東</td><td>東北東</td><td>東</td><td>東南東</td><td>南南東</td><td>南</td><td>南南西</td><td>西南西</td><td>西</td><td>西北西</td><td>北北西</td></tr>
+        <tr><td>23:00~1:00</td><td>1:00~3:00</td><td>3:00~5:00</td><td>5:00~7:00</td><td>7:00~9:00</td><td>9:00~11:00</td><td>11:00~13:00</td><td>13:00~15:00</td><td>15:00~17:00</td><td>17:00~19:00</td><td>19:00~21:00</td><td>21:00~23:00</td></tr>
+      </table>
     </div>
+    <div class="meaning-box">
+      <h2>64卦の意味</h2>
+      <div id="hexMeaningArea" class="hex-meaning-area"></div>
+    </div>
+
   </div>
 
   <div class="card">
@@ -199,6 +228,7 @@ window.onerror=function(msg, url, line, col, err){
     <div class="buttons">
       <button class="primary" id="saveBtn">保存</button>
       <button id="newBtn">新規</button>
+      <button id="resetLinesBtn">六爻リセット</button>
       <button id="exportBtn">JSON書き出し</button>
       <label class="filebtn">JSON読み込み<input class="hidden" type="file" id="importInput" accept="application/json"></label>
     </div>
@@ -211,7 +241,7 @@ window.onerror=function(msg, url, line, col, err){
 </div>
 
 <script>
-const LINE_OPTIONS=["--","ー","○","×"];
+const LINE_OPTIONS=["空","--","ー","×","○"];
 const STEMS=["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
 const BRANCHES=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
 const VOID_PAIRS=[["子","丑"],["寅","卯"],["辰","巳"],["午","未"],["申","酉"],["戌","亥"]];
@@ -237,6 +267,7 @@ function getProp(obj, path, fallback){
   return cur==null ? fallback : cur;
 }
 const USE_GOD_OPTIONS=["世爻","応爻","妻財","官鬼","父母","子孫","兄弟"];
+const GENRE_OPTIONS=["仕事","財運","人間関係","健康","恋愛・結婚","住まい","その他"];
 const SIX_SPIRITS=["青龍","朱雀","勾陳","騰蛇","白虎","玄武"];
 const FIVE_ELEMENTS=["木","火","土","金","水"];
 const generateMap={木:"火",火:"土",土:"金",金:"水",水:"木"};
@@ -356,6 +387,7 @@ function computeMotionKinds(mainBranch, changedBranch, position, mainNa){
 }
 function buildDisplayLines(inputSymbols,cal){
   const baseBits=inputSymbols.map(s=>symbolToLine(s).bit).join("");
+  if(baseBits.length!==6 || baseBits.indexOf("")!==-1){return {mainHex:null,changedHex:null,lines:[]};}
   const changedBits=inputSymbols.map(s=>{const l=symbolToLine(s); return l.isMoving?(l.bit==="1"?"0":"1"):l.bit;}).join("");
   const mainHex=hexByBits[baseBits];
   const hasMoving=inputSymbols.some(s=>symbolToLine(s).isMoving);
@@ -382,7 +414,7 @@ function buildDisplayLines(inputSymbols,cal){
 }
 function uuid(){return safeUuid();}
 function blankRecord(){
-  return {id:uuid(),readingDate:new Date().toISOString().slice(0,10),clientName:"",question:"",useGod:"世爻",memo:"",resultMemo:"",calendar:{monthBranch:"",dayStem:"",dayBranch:"",voidBranches:["",""]},inputSymbols:["--","--","--","--","--","--"],updatedAt:new Date().toISOString()};
+  return {id:uuid(),readingDate:new Date().toISOString().slice(0,10),clientName:"",question:"",useGod:"世爻",genre:"仕事",memo:"",resultMemo:"",calendar:{monthBranch:"",dayStem:"",dayBranch:"",voidBranches:["",""]},inputSymbols:["空","空","空","空","空","空"],lineMemos:["","","","","",""],updatedAt:new Date().toISOString()};
 }
 let record=blankRecord();
 let saved=[];
@@ -522,6 +554,9 @@ function renderFigure(computed, ctx, scoreCtx){
     return "";
   };
 
+  const shiLine = computed.lines.find(function(l){return computed.mainHex && l.position===computed.mainHex.shiLine;});
+  const shiElementForFigure = parseElement(shiLine && shiLine.mainLine ? shiLine.mainLine.branchWithElement : "");
+
   const linesCircle = [["木","火"],["火","土"],["土","金"],["金","水"],["水","木"]]
     .map(([a,b])=>`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="#222" stroke-width="2" marker-end="url(#arr)"/>`).join("");
   const star = [["木","土"],["土","水"],["水","火"],["火","金"],["金","木"]]
@@ -544,9 +579,11 @@ function renderFigure(computed, ctx, scoreCtx){
     const score = scoreText(el, scoreCtx);
     const astro = `${scoreCtx.monthElement===el?"🌙":""}${scoreCtx.dayElement===el?"☀️":""}`;
     const scoreLabel = score ? `${score}` : "";
+    const seLabel = shiElementForFigure===el ? "世" : "";
     return `
       <circle cx="${x}" cy="${y}" r="20" fill="#fff" stroke="#222" stroke-width="2"></circle>
       <text x="${x}" y="${y+7}" text-anchor="middle" class="svgtxt" font-size="20">${el}</text>
+      ${seLabel?`<text x="${x-24}" y="${y-20}" text-anchor="middle" class="svgtxt" font-size="20" fill="#d40000" font-weight="700">${seLabel}</text>`:""}
       <text x="${x+cfg.rel[0]}" y="${y+cfg.rel[1]}" text-anchor="middle" class="svgtxt" font-size="24" fill="#222">${rel}</text>
       ${astro?`<text x="${x+cfg.astro[0]}" y="${y+cfg.astro[1]}" text-anchor="middle" class="svgtxt astro" font-size="24">${astro}</text>`:""}
       ${scoreLabel?`<text x="${x+cfg.score[0]}" y="${y+cfg.score[1]}" text-anchor="middle" class="svgtxt" font-size="22" fill="#555">${scoreLabel}</text>`:""}
@@ -570,16 +607,17 @@ function renderFigure(computed, ctx, scoreCtx){
     </svg>`;
 }
 function bindInputs(){
-  ["readingDate","clientName","question","useGod","memo","resultMemo"].forEach(id=>{
+  ["readingDate","clientName","question","useGod","genre","memo","resultMemo"].forEach(id=>{
     document.getElementById(id).addEventListener("input",e=>{record[id]=e.target.value; render();});
   });
   document.getElementById("monthBranch").addEventListener("input",e=>{record.calendar.monthBranch=e.target.value; render();});
   document.getElementById("dayStem").addEventListener("input",e=>{record.calendar.dayStem=e.target.value; render();});
   document.getElementById("dayBranch").addEventListener("input",e=>{record.calendar.dayBranch=e.target.value; render();});
-  document.getElementById("void1").addEventListener("input",e=>{setVoidPair(e.target.value); render();});
-  document.getElementById("void2").addEventListener("input",e=>{setVoidPair(e.target.value); render();});
+  document.getElementById("void1").addEventListener("input",function(e){setVoidPair(e.target.value); render();});
+  document.getElementById("void2").addEventListener("input",function(e){setVoidPair(e.target.value); render();});
   document.getElementById("saveBtn").onclick=()=>{record.updatedAt=new Date().toISOString(); saved=[cloneObj(record),...saved.filter(r=>r.id!==record.id)]; saveStorage(); renderSaved(); alert("保存しました");};
   document.getElementById("newBtn").onclick=()=>{record=blankRecord(); render();};
+  document.getElementById("resetLinesBtn").onclick=()=>{record.inputSymbols=["空","空","空","空","空","空"]; record.lineMemos=["","","","","",""]; render();};
   document.getElementById("exportBtn").onclick=()=>{const blob=new Blob([JSON.stringify(saved,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`六爻占例バックアップ_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);};
   document.getElementById("importInput").onchange=e=>{const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{try{const data=JSON.parse(String(reader.result)); if(!Array.isArray(data))throw new Error(); saved=data; saveStorage(); renderSaved(); alert("読み込みました");}catch(err){alert("JSONを読み込めませんでした");}}; reader.readAsText(file);};
 }
@@ -719,8 +757,191 @@ function getContinuousGenerationExtras(data, isUseGod, computed, ctx, scoreCtx){
   return [];
 }
 
+
+function ensureLineMemos(){
+  if(!record.lineMemos || !Array.isArray(record.lineMemos)){
+    record.lineMemos=["","","","","",""];
+  }
+  while(record.lineMemos.length<6){ record.lineMemos.push(""); }
+}
+
+function buildBlankDisplayLines(inputSymbols){
+  var labels=["","初爻","二爻","三爻","四爻","五爻","上爻"];
+  var arr=[];
+  for(var i=0;i<inputSymbols.length;i++){
+    arr.push({
+      position:i+1,
+      label:labels[i+1],
+      sixSpirit:"",
+      hiddenSpirit:{branchWithElement:"",sixRelative:"",markers:[]},
+      mainLine:{symbol:inputSymbols[i],yinYang:null,isMoving:false,shiOrYing:"",branchWithElement:"",sixRelative:"",markers:[]},
+      changedLine:{symbol:"",branchWithElement:"",sixRelative:"",markers:[],motions:[]}
+    });
+  }
+  return arr;
+}
+
+
+const HEX_MEANINGS={
+  "乾為天":{overall:"天の創造力を象徴する最も力強い卦です。この卦が出たときは、あなたの中に大きな可能性とエネルギーがあることを示しています。
+しかし、すべての陽爻で構成されるこの卦は、「上九：亢龍有悔」が示すように、行き過ぎへの警告も含んでいます。力があるときこそ、謙虚さを忘れず、周囲との調和を大切にしてください。
+「飛龍在天」の境地を目指しつつも、常に「潜龍」の時期があったことを忘れないこと。それが乾為天の教えです。",work:"新規事業や大きなプロジェクトに最適な時期。リーダーシップを発揮し、積極的に挑戦しましょう。ただし、計画性と慎重さも忘れずに。",love:"積極的なアプローチが吉。自信を持って行動しましょう。ただし、強引になりすぎないよう注意。相手を尊重しながら、誠実に想いを伝えることが大切です。",health:"エネルギーに満ちた状態。活動的に過ごすことができます。ただし、過労には注意。休息と活動のバランスを保つことが重要です。",text:"乾。元亨利貞。
+
+乾は、元いに亨り、貞しきに利ろし。
+（けんは、おおいにとおり、ただしきによろし。）"},
+  "坤為地":{overall:"坤為地は、大地のようにすべてを受け入れ、育む卦です。自分が前に出て切り開くよりも、状況を受け止め、支え、整える姿勢が大切になります。
+主導権を握ろうとすると迷いやすく、信頼できる相手や流れに従うことで道が開けます。柔順さ、忍耐、持久力が吉を呼びます。",work:"協力者やサポート役として力を発揮する時期。独断で進めず、チームワークを大切に。地道な努力が後に大きな成果につながります。",love:"相手を受け入れ、支える姿勢が吉。押しすぎず、相手のペースに合わせることで関係が深まります。忍耐強く、信頼関係を築いていきましょう。",health:"無理をせず、体を休めることが大切。激しい運動よりも、ゆったりとした活動が適しています。栄養バランスにも気を配りましょう。",text:"坤。元亨、利牝馬之貞。君子有攸往、先迷後得主、利。西南得朋、東北喪朋。安貞吉。
+
+坤は、元いに亨る、牝馬の貞に利ろし。君子往くところ有り、先んずれば迷い、後るれば主を得る、利ろし。西南には朋を得、東北には朋を喪う。貞に安んずれば吉なり。
+
+坤為地の卦辞は、大地のように受容的であることの大切さを説いています。
+
+牝馬（ひんば） - 雌馬のような柔順さと持久力を持つこと
+先んずれば迷い、後るれば主を得る - リーダーに先んじて行動すると道に迷うが、従えば導きを得られる
+西南には朋を得 - 同質の者と協力すること
+安貞吉 - 正しい道に安んじていれば吉
+
+乾為天が創造・リーダーシップの卦であるのに対し、坤為地は受容・サポートの卦です。両者は対をなし、互いに補い合う関係にあります。"},
+  "水雷屯":{overall:"屯卦は「産みの苦しみ」を象徴します。新しい生命が誕生する時、最も困難な瞬間を経験するように、あなたも今、重要な転換期にいます。この困難は、より大きな成長のための必要なプロセスです。
+
+焦らず、忍耐強く、そして信頼できる協力者の助けを借りること。それが屯卦の教えです。",work:"新規事業や転職は困難が予想されます。準備を十分に整え、信頼できるパートナーや助言者を見つけることが成功の鍵。",love:"出会いや関係の始まりに困難が伴う時期。焦らず、ゆっくりと関係を育てましょう。信頼できる仲介者がいると良い展開に。",health:"体調を崩しやすい時期。無理をせず、専門家のアドバイスを受けながら、じっくりと回復に努めましょう。",text:"屯。元亨利貞。勿用有攸往。利建侯。
+
+屯は、元いに亨り、貞しきに利ろし。往くところ有るに用うること勿れ。侯を建つるに利ろし。
+
+屯卦は困難な時期を示しますが、「元亨利貞」とあるように、根本的には発展の可能性を秘めています。ただし、今は積極的に動く時ではありません。信頼できる協力者を得て、基盤を固めることが大切です。
+
+「侯を建つるに利ろし」とは、リーダーや協力者を立てることが吉であることを意味します。一人で困難に立ち向かうのではなく、適切な人材の助けを借りましょう。"},
+  "山水蒙":{overall:"蒙卦は「無知の自覚」と「学ぶ姿勢」の大切さを教えています。山の麓から湧き出る泉のように、あなたの中にも知恵の源泉があります。それを正しく導いてくれる師を見つけ、謙虚に学ぶことで、その泉は清らかな流れとなって広がっていくでしょう。
+
+「知らないことを知っている」― それこそが知恵の始まりです。",work:"まだ経験が足りない時期。先輩や専門家から学ぶ姿勢が大切。独断で進めず、指導を仰ぎましょう。",love:"経験不足や判断力の未熟さに注意。信頼できる人のアドバイスを聞き、焦らず関係を見極めましょう。",health:"自己判断せず、専門家の診断を受けることが重要。正しい知識を得て、適切な対処を。",text:"蒙。亨。匪我求童蒙、童蒙求我。初筮告、再三瀆、瀆則不告。利貞。
+
+蒙は亨る。我より童蒙に求むるに匪ず、童蒙より我に求む。初筮は告ぐ、再三すれば瀆る、瀆るれば則ち告げず。貞しきに利ろし。
+
+蒙卦は学びの姿勢について説いています。「童蒙より我に求む」とは、学ぶ側が謙虚に師を求めるべきことを示します。師が弟子を追いかけるのではなく、学びたいという真摯な心が大切です。
+
+「再三すれば瀆る」とは、同じことを何度も聞くのは師への冒涜であり、真剣に学ぶ姿勢がなければ教えは得られないことを意味します。"},
+  "水天需":{overall:"需卦は、雲が空に満ちて雨を待つ状態を表しています。雨は必ず降ります。それを信じて待つことができるかどうかが問われています。
+
+「待つ」ことは弱さではなく、知恵です。正しい時機を見極める力こそ、成功への鍵となります。",work:"新規プロジェクトや転職は今すぐではなく、準備期間と捉えましょう。スキルアップや情報収集に時間を使うと良い結果に。",love:"焦って告白や決断をする時ではありません。相手の気持ちが熟すのを待ち、自分磨きに励みましょう。時が来れば自然と進展します。",health:"急いで結果を求めず、じっくりと体調を整える時期。規則正しい生活と適度な休養が回復への近道です。",text:"需。有孚、光亨、貞吉。利渉大川。
+
+需は、孚あれば光いに亨る、貞しければ吉なり。大川を渉るに利ろし。
+
+需卦は「待つ」ことの卦ですが、単なる受動的な待機ではありません。「有孚」（誠実さ、信念）を持って待つことで、「光亨」（大いに通じる）という結果を得られます。
+
+「大川を渉るに利ろし」とは、大きな困難を乗り越えることができることを示しています。正しい時機を待てば、どんな障害も克服できるのです。"},
+  "天水訟":{overall:"訟卦は「争わないこと」の知恵を教えています。たとえ自分が正しくても、争いを続けることで失うものは大きいのです。
+勝訴より和解。正しさを主張することより、平和を選ぶ勇気を持ちましょう。",work:"同僚や取引先とのトラブルに注意。訴訟沙汰になる前に、第三者を交えた調停を検討しましょう。",love:"パートナーとの意見の相違や対立に注意。感情的にならず、話し合いで解決を。別れを考える前に冷静な判断を。",health:"ストレスによる不調に注意。争いごとは心身に悪影響。リラックスする時間を意識的に作りましょう。",text:"訟。有孚、窒惕、中吉、終凶。利見大人、不利渉大川。
+
+訟は、孚ありて窒がり惕る。中なれば吉、終われば凶。大人を見るに利ろし、大川を渉るに利ろしからず。
+
+訟卦は争いの卦ですが、「中吉、終凶」が重要なメッセージです。争いの途中で止めれば吉、最後まで争い続ければ凶となります。
+
+「大人を見るに利ろし」とは、公正な調停者や権威ある人物に相談することが良いことを示します。しかし「大川を渉るに利ろしからず」とあるように、大きな冒険や決断は避けるべき時です。"},
+  "地水師":{overall:"集団を率いる者には、大きな責任が伴います。力を正しく使い、人々の信頼に応える覚悟を持ちましょう。",work:"チームをまとめる役割が求められる時。規律を重んじつつ、部下や同僚への配慮を忘れずに。",love:"関係をリードする立場に立つことも。しかし支配ではなく、相手を尊重した導きが大切です。",health:"生活リズムを規則正しく整えることが大切。軍隊のような規律ある生活が健康につながります。",text:"師。貞、丈人吉、无咎。
+
+師は、貞なれば丈人は吉にして咎なし。
+
+師卦は集団を率いることについて説いています。「丈人」とは経験豊かな長老、すなわち優れた指導者のこと。正しい道を歩み、経験と徳のある人物がリーダーとなれば、吉であり咎めはないとされます。"},
+  "水地比":{overall:"人は一人では生きられません。信頼できる人々との絆を大切にし、共に歩む道を選びましょう。",work:"チームワークが成功の鍵。信頼できる仲間やパートナーと協力することで、大きな成果を上げられます。",love:"パートナーとの絆を深める良い時期。信頼関係を築き、互いに支え合う関係を大切にしましょう。",health:"一人で抱え込まず、専門家や家族のサポートを受けましょう。周囲の助けが回復を早めます。",text:"比。吉。原筮、元永貞、无咎。不寧方來、後夫凶。
+
+比は吉なり。原ねて筮い、元いに永く貞なれば咎なし。寧からざる者も方に来たる、後るる夫は凶なり。
+
+比卦は人と親しみ協力することを説きます。「不寧方來」とは、まだ安定していない者も集まってくることを示し、「後夫凶」は、遅れて参加する者には凶があることを警告しています。
+
+早い段階で信頼できる仲間と結びつくことが大切であり、機会を逃すと不利になることを示しています。"},
+  "風天小畜":{overall:"小さな積み重ねが、やがて大きな成果につながります。今は蓄える時です。",work:"大きな成果はまだ先。今は準備期間と捉え、スキルや人脈を蓄えましょう。",love:"まだ関係が成熟していない時期。焦らず、少しずつ信頼を築いていきましょう。",health:"体力を蓄える時期。無理をせず、栄養と休養をしっかり取りましょう。",text:"小畜。亨。密雲不雨、自我西郊。
+
+小畜は亨る。密雲なれど雨ふらず、我が西郊よりす。
+
+雲は密集しているが、まだ雨は降らない状態。力は蓄えられているが、まだ発揮する時ではありません。焦らず待つことで、やがて恵みの雨となって成果が現れます。"},
+  "天沢履":{overall:"礼節と慎重な行動を象徴する卦。「履」は踏む、礼を行うという意味。虎の尾を踏んでも噛まれないように、正しい礼節と慎重さがあれば、危険な状況も乗り越えられることを説いています。\n\n礼を尽くし、慎重に行動すれば、どんな困難も乗り越えられます。",work:"目上の人や取引先への礼節が重要。慎重に振る舞えば、難しい交渉も成功します。",love:"相手への敬意と礼儀を忘れずに。マナーを守った誠実な態度が、関係を良好に保ちます。",health:"無理をせず、慎重に行動しましょう。危険を避け、安全第一で過ごすことが大切。",text:"履虎尾、不咥人、亨。\n\n虎の尾を履むも、人を咥まず、亨る。\n\n虎の尾を踏むという危険な状況にあっても、正しい態度と礼節を守れば、虎に噛まれることはありません。困難な状況でも、適切な振る舞いで切り抜けられることを示しています。"},
+  "地天泰":{overall:"平和と繁栄を象徴する最も吉祥な卦の一つ。地が上に、天が下にあり、陰と陽が交わって調和している状態。万物が生い茂り、繁栄する理想的な時期を示しています。\n\n泰の時は、調和と繁栄の時です。この好機を逃さず、積極的に行動しましょう。",work:"事業は順調に発展。新規プロジェクトも成功しやすい時期。積極的に進めましょう。",love:"最高に良い時期。出会い、交際、結婚すべてに吉。相思相愛の関係が築けます。",health:"心身ともに充実した状態。エネルギーに満ち、活動的に過ごせます。",text:"泰。小往大來、吉亨。\n\n泰は、小往き大来たる、吉にして亨る。\n\n小さなものが去り、大きなものが来る。これは陰が外に出て、陽が内に入ることを意味し、天地が交わって万物が生成する最も調和した状態です。すべてが順調に進み、大いに発展する時期を示しています。"},
+  "天地否":{overall:"閉塞と停滞を象徴する卦。泰卦とは逆に、天が上に、地が下にあり、陰陽が交わらない状態。万物が滞り、困難な時期ですが、「否極泰来」―困難を乗り越えれば好転することを示唆しています。\n\n「否極泰来」― 困難な時期を耐え抜けば、必ず好転の時が訪れます。今は忍耐の時です。",work:"停滞や障害が多い時期。大きな決断は避け、現状維持に努めましょう。",love:"関係がうまくいかない時期。無理に進めず、距離を置いて様子を見ることも大切。",health:"体調不良に注意。無理をせず、休養を取ることが大切です。",text:"否之匪人、不利君子貞。大往小來。\n\n否は人に匪ず、君子の貞に利ろしからず。大往き小来たる。\n\n否卦は人の道にあらず、君子にとっては厳しい時期です。大きなものが去り、小さなものが来る―陽が外に出て、陰が内に入り、天地の気が通じない閉塞した状態を示しています。"},
+  "天火同人":{overall:"志を同じくする仲間との協力を象徴する卦。火が天に向かって燃え上がるように、明るく開かれた心で人々と交わり、共通の目標に向かって協力することの大切さを説いています。\n\n一人の力には限界があります。志を同じくする仲間と手を携え、共に歩みましょう。",work:"チームワークが成功の鍵。志を同じくする仲間と協力して、大きな目標に挑みましょう。",love:"共通の趣味や価値観を持つ人との出会いに吉。友人からの紹介も良いでしょう。",health:"仲間と一緒に運動やスポーツをするのに良い時期。社交的な活動が心身の健康に。",text:"同人于野、亨。利渉大川、利君子貞。\n\n同人は野に于いてす、亨る。大川を渉るに利ろし、君子の貞に利ろし。\n\n「野に于いてす」とは、私的な場所ではなく広い野原で人々と交わること。狭い仲間内ではなく、広く公正に人々と協力することが吉であることを示しています。"},
+  "火天大有":{overall:"豊かさと繁栄を象徴する大吉の卦。太陽が天高く輝くように、才能、富、人望すべてが満ち溢れる最高の時期を示しています。しかし、驕らず謙虚さを保つことが大切です。\n\n大有の時こそ謙虚さを忘れずに。驕れる者久しからず、栄華の中で徳を積みましょう。",work:"大成功の時。才能が認められ、地位も収入も向上します。リーダーシップを発揮しましょう。",love:"最高に良い時期。魅力が増し、素晴らしい出会いや関係の発展が期待できます。",health:"活力に満ちた状態。何事にも積極的に取り組めます。ただし過信は禁物。",text:"大有。元亨。\n\n大有は、元いに亨る。\n\n「元亨」は最高の吉を示します。太陽が天の中央で輝くように、あらゆることが順調に進み、大いに発展する時期です。周囲からの信頼も厚く、大きな成果を上げることができます。"},
+  "地山謙":{overall:"謙虚さの美徳を象徴する卦。山が地の下にへりくだるように、自らを低くすることで、かえって高められることを説いています。",work:"謙虚な姿勢が評価される時期。出しゃばらず、着実に成果を積みましょう。",love:"控えめな態度が好印象。相手を立てることで関係が深まります。",health:"無理をせず、体の声に耳を傾けましょう。過信は禁物です。",text:"謙。亨。君子有終。\n\n謙は亨る。君子終わりあり。\n\n謙虚な者は必ず成功する。自らを低くする者こそ、最後には高められる。"},
+  "雷地予":{overall:"喜びと楽しみを象徴する卦。雷が地上に響くように、人々が歓喜する様子を表します。しかし、楽しみに溺れすぎないよう注意も必要です。",work:"チームの士気が高まる時期。モチベーションを活かして前進しましょう。",love:"楽しいデートや交際に吉。ただし、浮かれすぎに注意。",health:"精神的に充実した状態。ただし、快楽に溺れて不摂生にならぬよう注意。",text:"豫。利建侯行師。\n\n豫は侯を建て師を行るに利ろし。\n\n喜びの時は人心を得やすい。この機に協力者を集め、大事を成すに良い時。"},
+  "沢雷随":{overall:"従い、適応することを象徴する卦。時勢に逆らわず、柔軟に対応することで、良い結果を得られることを説いています。",work:"上司や時代の流れに適応することで成功。固執せず柔軟に。",love:"相手に合わせる柔軟さが大切。押し付けず、自然な流れに任せましょう。",health:"体の変化に柔軟に対応。無理な養生法より、自然体が一番です。",text:"随。元亨利貞、无咎。\n\n随は元いに亨り貞しきに利ろし、咎なし。\n\n正しく従えば大いに発展する。時勢を読み、柔軟に対応することが大切。"},
+  "山風蠱":{overall:"腐敗と改革を象徴する卦。山の下で風が吹き、物事が停滞し腐敗する状態。しかし、これを機に改革し、新たな出発をする必要性を説いています。",work:"組織や仕事の問題点を改革する好機。大胆かつ慎重に。",love:"関係のマンネリや問題を見直す時期。勇気を持って改善に取り組みましょう。",health:"悪習慣を改める時期。生活習慣の見直しで健康回復を。",text:"蠱。元亨、利渉大川。先甲三日、後甲三日。\n\n蠱は元いに亨る、大川を渉るに利ろし。甲に先だつこと三日、甲に後るること三日。\n\n問題を放置せず、慎重に計画を立てて改革に取り組むべき時。"},
+  "地沢臨":{overall:"近づき臨むことを象徴する卦。大地が沢に臨むように、上が下に近づき、親しく接する様子。指導者が民に寄り添い、成長を促す時期を示します。",work:"新しいプロジェクトや人材育成に良い時期。成長を促しましょう。",love:"積極的にアプローチする時期。ただし、関係の持続には注意が必要。",health:"今は調子が良いが、油断せず健康管理を続けることが大切。",text:"臨。元亨利貞。至于八月有凶。\n\n臨は元いに亨り貞しきに利ろし。八月に至りて凶あり。\n\n今は成長の好機だが、やがて衰える時が来ることを忘れずに。"},
+  "風地観":{overall:"観ること、観られることを象徴する卦。風が地上を吹き渡り、すべてを見通すように、深い洞察力と、自らが模範となることの大切さを説いています。",work:"状況をよく観察し、全体を把握してから行動しましょう。",love:"相手をよく観察し、本質を見極める時期。表面に惑わされずに。",health:"体の状態をよく観察し、小さな変化も見逃さないようにしましょう。",text:"観。盥而不薦、有孚顒若。\n\n観は、盥いて薦めず、孚ありて顒若たり。\n\n表面的な儀式より、真心が大切。深く観察し、本質を見抜きましょう。"},
+  "火雷噬嗑":{overall:"噛み砕くことを象徴する卦。口の中の障害物を噛み砕いて除くように、問題や障害を断固として取り除く必要性を説いています。",work:"問題を放置せず、断固として解決に当たりましょう。",love:"関係の障害となるものをはっきりさせ、解決する時期。",health:"悪い習慣や病根を断ち切る決意が必要です。",text:"噬嗑。亨。利用獄。\n\n噬嗑は亨る。獄を用うるに利ろし。"},
+  "山火賁":{overall:"美しく飾ることを象徴する卦。山の下で火が輝き、美しさを添える様子。外見の美しさも大切だが、内面の充実がより重要であることを説いています。",work:"プレゼンや見せ方を工夫する時期。ただし本質を忘れずに。",love:"外見を整えることで魅力アップ。ただし、内面も磨きましょう。",health:"外見だけでなく、内側からの健康美を目指しましょう。",text:"賁。亨。小利有攸往。\n\n賁は亨る。小しく往くところあるに利ろし。\n\n美しく飾ることは良いが、大事には向かない。小さな事柄に吉。"},
+  "山地剥":{overall:"剥がれ落ちることを象徴する卦。山が地に崩れ落ちるように、物事が衰退し崩壊する時期。今は忍耐し、時機を待つことが大切です。",work:"困難な時期。大きな動きは避け、現状維持に努めましょう。",love:"関係が冷え込みやすい時期。無理に進展を求めないこと。",health:"体調を崩しやすい時期。無理をせず、休養を取りましょう。",text:"剥。不利有攸往。\n\n剥は往くところあるに利ろしからず。\n\n今は動く時ではない。静かに時を待ち、力を蓄えましょう。"},
+  "地雷復":{overall:"復ることを象徴する卦。地の下で雷が動き始める。冬至に陽が戻るように、困難の底から再起する希望の兆しを示しています。\n\n再出発の時。困難を乗り越え、新たなスタートを切りましょう。",work:"失敗から学び、再チャレンジに吉。原点に立ち返りましょう。",love:"関係の再構築、復縁に良い時期。過去を振り返り、新たに始めましょう。",health:"回復の兆し。焦らず、ゆっくりと体力を取り戻しましょう。",text:"復。亨。出入无疾、朋來无咎。反復其道、七日來復。利有攸往。\n\n復は亨る。出入疾いなく、朋来たりて咎なし。その道を反復し、七日にして来復す。往くところあるに利ろし。"},
+  "天雷无妄":{overall:"偽りのない真実を象徴する卦。天の下で雷が轟くように、自然の摂理に従い、誠実に生きることの大切さを説いています。",work:"正直に誠意を持って取り組めば成功。不正は禁物。",love:"誠実な態度が大切。駆け引きや偽りは逆効果です。",health:"自然体で過ごすことが一番。無理な健康法は避けましょう。",text:"无妄。元亨利貞。其匪正有眚、不利有攸往。\n\n无妄は元いに亨り貞しきに利ろし。それ正しきに匪ざれば眚あり、往くところあるに利ろしからず。\n\n誠実であれば発展する。偽りや邪心があれば災いを招く。"},
+  "山天大畜":{overall:"大いに蓄えることを象徴する卦。山が天を止めるように、大きな力を蓄え、時を待つ状態。大きな成果のための準備期間です。",work:"実力を蓄え、大きなチャンスに備える時期。学びと準備を。",love:"じっくりと関係を育てる時期。急がず、信頼を蓄積しましょう。",health:"体力・気力を蓄える時期。将来に向けて基礎体力をつけましょう。",text:"大畜。利貞。不家食、吉。利渉大川。\n\n大畜は貞しきに利ろし。家に食せず、吉なり。大川を渉るに利ろし。\n\n才能や資源を蓄える時。大きな挑戦も可能だが、準備が大切。"},
+  "山雷頤":{overall:"養うことを象徴する卦。口で物を噛む形を表し、心身を養うこと、言葉に気をつけることの大切さを説いています。",work:"知識や技術を取り入れ、自己を養う時期。発言には慎重に。",love:"言葉遣いに注意。相手を養い育てる気持ちが大切です。",health:"食事に気を配り、心身を養いましょう。暴飲暴食は禁物。",text:"頤。貞吉。観頤、自求口実。\n\n頤は貞しければ吉なり。頤を観て、自ら口実を求む。\n\n何を取り入れ、何を発するかが大切。心身の養生と言葉に注意を。"},
+  "沢風大過":{overall:"大いに過ぎることを象徴する卦。棟木がたわむほどの重圧。限界を超えた状態を示し、非常時には非常の手段が必要なことを説いています。",work:"過重負担に注意。しかし、大胆な行動で打開できることも。",love:"関係に無理がかかっている可能性。思い切った決断が必要かも。",health:"過労に注意。限界を感じたら、すぐに休息を取りましょう。",text:"大過。棟橈。利有攸往、亨。\n\n大過は棟撓む。往くところあるに利ろし、亨る。\n\n限界に近い状態だが、果敢に行動すれば道は開ける。"},
+  "坎為水":{overall:"険しい困難を象徴する卦。水が重なり、幾重もの困難に直面する状態。しかし、水のように柔軟に、誠実さを失わず進めば、必ず乗り越えられます。",work:"試練の時。水のように柔軟に対処しましょう。",love:"困難な時期だが、誠実さで乗り越えられます。",health:"困難な状況でも、心を穏やかに保つことが大切。",text:"習坎。有孚、維心亨、行有尚。\n\n習坎は孚あり、維れ心亨る、行けば尚ばるることあり。\n\n困難が重なるが、誠実さと信念を持って進めば道は開ける。"},
+  "離為火":{overall:"火と明るさを象徴する卦。火が重なり、明るく輝く状態。知恵と明晰さを持ち、正しいものに付き従うことの大切さを説いています。",work:"知恵と明晰さで成功。ただし柔軟さも忘れずに。",love:"明るく知的な魅力が増す時期。相手への理解を深めましょう。",health:"火の気が強い時期。怒りや興奮を抑え、バランスを取りましょう。",text:"離。利貞、亨。畜牝牛、吉。\n\n離は貞しきに利ろし、亨る。牝牛を畜えば吉なり。\n\n明るく正しい道を歩み、柔順さを保てば吉。"},
+  "沢山咸":{overall:"感じ合うことを象徴する卦。若い男女が互いに惹かれ合うように、心と心が通じ合う状態。恋愛や人間関係において最も良い卦の一つです。\n\n心が通じ合う時。特に恋愛・結婚に大吉。",work:"人との協力関係がうまくいく時期。コミュニケーションが円滑に。",love:"最高に良い時期。出会い、告白、結婚すべてに吉。",health:"心身のバランスが取れた状態。気持ちが穏やかに保たれます。",text:"咸。亨、利貞。取女吉。\n\n咸は亨る、貞しきに利ろし。女を取るに吉なり。"},
+  "雷風恒":{overall:"恒久不変を象徴する卦。雷と風が互いに助け合うように、長く続く関係や状態を示します。継続することの価値と、変わらぬ信念の大切さを説いています。\n\n持続と一貫性が大切。長期的な視点で取り組みましょう。",work:"継続的な努力が実を結ぶ時期。粘り強く取り組みましょう。",love:"長続きする関係に吉。結婚生活の安定を示します。",health:"継続的な健康管理が大切。習慣を持続させましょう。",text:"恒。亨、无咎、利貞。利有攸往。\n\n恒は亨る、咎なし、貞しきに利ろし。往くところあるに利ろし。"},
+  "天山遯":{overall:"退くことを象徴する卦。天が山から遠ざかるように、時には退くことが最善の選択であることを説いています。戦略的撤退の知恵です。\n\n今は退く時。無理に前進せず、時機を待ちましょう。",work:"撤退や方向転換を検討すべき時期。損切りも選択肢。",love:"距離を置くことで関係が良くなることも。焦らずに。",health:"無理を続けず、休養を取ることが大切です。",text:"遯。亨。小利貞。\n\n遯は亨る。小しく貞しきに利ろし。"},
+  "雷天大壮":{overall:"大いなる力を象徴する卦。雷が天に轟くような強大な勢い。力が充実した状態ですが、力に頼りすぎないよう注意が必要です。\n\n力が充実している時だが、正しく使わなければ災いを招く。",work:"勢いに乗って大きな成果を。ただし驕りは禁物。",love:"積極的なアプローチが吉。ただし強引になりすぎないよう注意。",health:"エネルギーに満ちた状態。ただし無茶は禁物です。",text:"大壮。利貞。\n\n大壮は貞しきに利ろし。"},
+  "火地晋":{overall:"進むことを象徴する卦。太陽が地上に昇るように、明るく前進する時期。昇進や発展に恵まれ、才能が認められる好機です。\n\n順調に発展する時。才能が認められ、厚遇を受ける。",work:"昇進や評価アップに吉。実力が認められます。",love:"関係が進展する良い時期。積極的にアプローチしましょう。",health:"回復に向かう時期。前向きな姿勢が健康にも良い影響を。",text:"晋。康侯用錫馬蕃庶、昼日三接。\n\n晋は康侯馬を錫わること蕃庶、昼日に三たび接す。"},
+  "地火明夷":{overall:"光が傷つけられることを象徴する卦。太陽が地の下に沈むように、明るさを隠して困難な時期を耐える知恵を説いています。\n\n困難な時期は才能を隠し、じっと耐えることが大切。",work:"困難な状況。才能を隠し、時機を待ちましょう。",love:"今は目立たず、控えめにしていることが吉。",health:"体調管理に注意。無理をせず、静かに過ごしましょう。",text:"明夷。利艱貞。\n\n明夷は艱貞に利ろし。"},
+  "風火家人":{overall:"家庭を象徴する卦。風が火を煽るように、家庭内の秩序と調和の大切さを説いています。内側を正すことで、外にも良い影響が及びます。\n\n家庭の秩序を正すことが第一。内を治めて外に及ぼす。",work:"組織内の秩序と協調が大切。チームワークを重視。",love:"家庭的な関係に吉。結婚生活の安定を示します。",health:"家庭環境を整えることが健康につながります。",text:"家人。利女貞。\n\n家人は女の貞に利ろし。"},
+  "火沢睽":{overall:"背き離れることを象徴する卦。火は上に、水は下にと、互いに逆方向に向かう状態。対立や意見の相違がありますが、うまく調和させることで発展の道も。\n\n対立の中にも調和の道はある。小さなことから始めましょう。",work:"対立が生じやすい時期。小さなことから協力関係を築きましょう。",love:"意見の相違に注意。異なる個性を認め合うことが大切。",health:"心身のバランスが崩れやすい。調和を心がけて。",text:"睽。小事吉。\n\n睽は小事に吉なり。"},
+  "水山蹇":{overall:"足を引きずって歩く困難を象徴する卦。前に水があり、後ろに山がある進退窮まった状態。しかし、知恵と忍耐で道は開けます。\n\n困難な時は協力者を求め、柔軟に対処することが大切。",work:"困難に直面。知恵者の助言を求めましょう。",love:"障害が多い時期。焦らず、助けを求めることも大切。",health:"回復に時間がかかる時期。焦らずじっくりと。",text:"蹇。利西南、不利東北。利見大人、貞吉。\n\n蹇は西南に利ろし、東北に利ろしからず。大人を見るに利ろし、貞しければ吉なり。"},
+  "雷水解":{overall:"解き放つことを象徴する卦。雷雨が過ぎて緊張が解ける状態。困難が解消し、問題が解決に向かう時期を示しています。\n\n問題が解決に向かう時。迅速に行動すれば吉。",work:"問題が解決に向かう。障害が取り除かれます。",love:"誤解が解け、関係が改善する時期。",health:"体調が回復に向かう。ストレスが解消されます。",text:"解。利西南。无所往、其來復吉。有攸往、夙吉。\n\n解は西南に利ろし。往くところなければその来復するに吉なり。往くところあれば夙くして吉なり。"},
+  "山沢損":{overall:"損なうことを象徴する卦。下を減らして上に益する状態。一時的な損失や犠牲が、長期的には利益をもたらすことを説いています。\n\n誠実な心で損を受け入れれば、やがて益となる。",work:"一時的な損失を受け入れることで、長期的利益を得られます。",love:"相手のために譲歩することで関係が良くなります。",health:"欲望を抑え、節制することで健康に。",text:"損。有孚、元吉、无咎、可貞。利有攸往。\n\n損は孚あれば元いに吉にして咎なく、貞にすべし。往くところあるに利ろし。"},
+  "風雷益":{overall:"益することを象徴する卦。上が下に与え、全体が潤う状態。利益が増し、発展する好機を示しています。\n\n発展の好機。大きな挑戦も成功しやすい時期。",work:"利益が増す時期。新規事業や拡大に吉。",love:"関係が発展する良い時期。積極的な行動が吉。",health:"体力が増し、活力に満ちた状態。",text:"益。利有攸往、利渉大川。\n\n益は往くところあるに利ろし、大川を渉るに利ろし。"},
+  "沢天夬":{overall:"決断することを象徴する卦。水が天に溢れるように、決断の時が来たことを示します。悪を断ち切り、正しい道を選ぶ勇気が必要です。\n\n決断の時。公明正大に行動し、武力に頼らないこと。",work:"決断を下すべき時。悪習や問題を断ち切りましょう。",love:"はっきりと気持ちを伝える時期。曖昧さを排除しましょう。",health:"悪習慣を断ち切る決意を。思い切った改善が必要。",text:"夬。揚于王庭、孚号。有厲、告自邑。不利即戎、利有攸往。\n\n夬は王庭に揚ぐ、孚ありて号ぶ。厲きことあり、邑より告ぐ。戎に即くに利ろしからず、往くところあるに利ろし。"},
+  "天風姤":{overall:"不意の出会いを象徴する卦。一陰が五陽の下から忍び込む状態。予期せぬ出会いや誘惑に注意が必要な時期を示しています。\n\n誘惑に注意。表面的な魅力に惑わされないこと。",work:"新しい話には注意。うまい話には裏があることも。",love:"出会いはあるが、相手をよく見極めることが大切。",health:"誘惑に負けず、節制を心がけましょう。",text:"姤。女壮。勿用取女。\n\n姤は女壮なり。女を取るに用うること勿れ。"},
+  "沢地萃":{overall:"集まることを象徴する卦。水が地に集まるように、人々が一所に集まる状態。団結と協力によって大きな力を発揮できる時期です。\n\n人が集まり力を合わせる時。リーダーの下に団結しましょう。",work:"チームの結束が強まる時期。協力して大きな成果を。",love:"縁が集まる時期。良い出会いに恵まれます。",health:"仲間と一緒に健康活動をするのに良い時期。",text:"萃。亨。王假有廟、利見大人。亨、利貞。用大牲吉、利有攸往。\n\n萃は亨る。王廟に仮る、大人を見るに利ろし。亨り貞しきに利ろし。大牲を用いて吉、往くところあるに利ろし。"},
+  "地風升":{overall:"昇ることを象徴する卦。木が地から伸びるように、着実に上昇する状態。努力が報われ、地位や能力が向上する時期です。\n\n着実に上昇する時。目上の人に会うことで道が開ける。",work:"昇進や成長に吉。着実にステップアップできます。",love:"関係が着実に発展する時期。焦らず進みましょう。",health:"体調が上向く時期。前向きに取り組みましょう。",text:"升。元亨。用見大人、勿恤。南征吉。\n\n升は元いに亨る。用て大人を見る、恤うること勿れ。南に征けば吉なり。"},
+  "沢水困":{overall:"困窮を象徴する卦。沢の水が枯れるような苦しい状態。しかし、君子はこの困難の中でも志を曲げず、忍耐によって道を開きます。\n\n困難な時期だが、志を持ち続ければ道は開ける。言葉より行動で示す時。",work:"苦境に立たされるが、粘り強く耐えましょう。",love:"困難な時期。互いを信じ、支え合うことが大切。",health:"辛い時期だが、希望を失わないことが大切。",text:"困。亨。貞大人吉、无咎。有言不信。\n\n困は亨る。貞なれば大人は吉にして咎なし。言うことあれど信ぜられず。"},
+  "水風井":{overall:"井戸を象徴する卦。井戸は場所を変えても、水を汲んで人々を潤し続けます。変わらぬ徳を持ち、人々に貢献することの大切さを説いています。\n\n変わらぬ徳で人々に貢献し続けることが大切。",work:"地道に貢献し続けることで信頼を得られます。",love:"変わらぬ愛情が大切。安定した関係を築きましょう。",health:"基本的な健康習慣を続けることが大切。",text:"井。改邑不改井、无喪无得。往來井井。\n\n井は邑を改むるも井を改めず、喪うなく得るなし。往来井井たり。"},
+  "沢火革":{overall:"変革を象徴する卦。火と水が互いに消し合うように、古いものを一新する時期。大きな変化や改革が必要であり、それが成功する時を示しています。\n\n変革の時が来た。正しく行えば、大いに発展する。",work:"改革や方向転換に良い時期。大胆に変えましょう。",love:"関係の刷新、新たなスタートに吉。",health:"生活習慣を大きく変える好機。",text:"革。己日乃孚。元亨利貞、悔亡。\n\n革は己の日に乃ち孚あり。元いに亨り貞しきに利ろし、悔い亡ぶ。"},
+  "火風鼎":{overall:"鼎（かなえ）を象徴する卦。鼎は食物を調理し、神に捧げる神聖な器。新しいものを生み出し、賢者を養い用いることの大切さを説いています。\n\n新しいものを生み出す時。賢者を用いれば大いに発展する。",work:"新規事業や刷新に大吉。優秀な人材を活用しましょう。",love:"新鮮な関係や出会いに吉。",health:"新しい健康法や食生活の改善に良い時期。",text:"鼎。元吉、亨。\n\n鼎は元いに吉にして亨る。"},
+  "震為雷":{overall:"雷を象徴する卦。雷が重なり、大きな衝撃と震動を表します。驚きや衝撃がありますが、それを機に目覚め、成長することができます。\n\n衝撃があっても、冷静さを保てば大事を失わない。",work:"突発的な事態に注意。しかし、それが好機になることも。",love:"衝撃的な出来事があるかも。しかし冷静に対処を。",health:"突然の変化に注意。動揺しても冷静さを保つこと。",text:"震。亨。震來虩虩、笑言啞啞。震驚百里、不喪匕鬯。\n\n震は亨る。震の来たるとき虩虩たり、笑言啞啞たり。震は百里を驚かすも、匕鬯を喪わず。"},
+  "艮為山":{overall:"山を象徴する卦。山が重なり、動かず静止している状態。止まるべき時に止まり、動くべき時に動く、時宜を得た行動の大切さを説いています。\n\n今は止まる時。無理に動かず、静かに時を待ちましょう。",work:"動くより止まることが吉。慎重に状況を見極めましょう。",love:"焦らず、現状維持が良い時期。",health:"休養を取り、心身を休める時期。",text:"艮其背、不獲其身。行其庭、不見其人。无咎。\n\nその背に艮まり、その身を獲ず。その庭を行くも、その人を見ず。咎なし。"},
+  "風山漸":{overall:"漸進することを象徴する卦。雁が順序正しく飛ぶように、物事は段階を経て進むべきことを説いています。焦らず、着実に進みましょう。\n\n順序を踏んで進めば吉。特に結婚に良い卦。",work:"着実に段階を踏んで進めることで成功します。",love:"段階を踏んだ交際が吉。焦らず進みましょう。",health:"焦らず、段階的に回復を目指しましょう。",text:"漸。女歸吉、利貞。\n\n漸は女の帰するに吉なり、貞しきに利ろし。"},
+  "雷沢帰妹":{overall:"妹が嫁ぐことを象徴する卦。正式な手順を踏まない婚姻を暗示し、困難が伴うことを示します。焦らず、正しい道を選ぶことが大切です。\n\n焦って進めると凶。正しい手順と時機を待つこと。",work:"正式な手順を踏まないと失敗しやすい時期。",love:"急いで進めると問題が。慎重に進めましょう。",health:"焦らず、基本に忠実に健康管理を。",text:"歸妹。征凶、无攸利。\n\n帰妹は征けば凶なり、利ろしきところなし。"},
+  "雷火豊":{overall:"豊かさの頂点を象徴する卦。雷と火が合わさり、最も盛大な状態。しかし、盛極まれば衰える。この好機を逃さず、憂いなく行動しましょう。\n\n最盛期。太陽が中天にあるうちに行動しましょう。",work:"最盛期。大いに活躍できますが、驕らないこと。",love:"関係が最も良い時期。この機会を大切に。",health:"活力に満ちた状態。ただし過信は禁物。",text:"豐。亨、王假之。勿憂、宜日中。\n\n豊は亨る、王これに仮る。憂うること勿れ、日中に宜し。"},
+  "火山旅":{overall:"旅を象徴する卦。山の上で火が燃えるように、一所に留まらない状態。旅人として慎重に、謙虚に振る舞うことの大切さを説いています。",work:"一時的なポジション。謙虚に慎重に振る舞いましょう。",love:"一時的な関係に注意。安定を求めるなら慎重に。",health:"旅先や環境の変化に注意。体調管理を怠らずに。",text:"旅。小亨、旅貞吉。\n\n旅は小しく亨り、旅の貞なれば吉なり。"},
+  "巽為風":{overall:"風を象徴する卦。風が重なり、柔らかくすべてに浸透する状態。従順でありながら、着実に影響を与えていく力を示しています。\n\n柔軟に従いながらも、着実に目標に向かって進む時。",work:"柔軟な姿勢で上司や環境に適応しましょう。",love:"柔らかく相手に寄り添うことで関係が深まります。",health:"穏やかに心身を整える時期。無理のない養生を。",text:"巽。小亨、利有攸往、利見大人。\n\n巽は小しく亨る、往くところあるに利ろし、大人を見るに利ろし。"},
+  "兌為沢":{overall:"喜びを象徴する卦。沢が重なり、人々が喜び合い交流する状態。明るく楽しい交流がもたらす幸福と、それを節度あるものにする大切さを説いています。\n\n喜びの時。ただし、正しさを保つことで本当の幸福を得られる。",work:"和やかな雰囲気で仕事が進む時期。コミュニケーションが円滑に。",love:"楽しく喜びに満ちた関係。笑顔が幸運を呼びます。",health:"精神的に明るく健康な状態。楽しく過ごしましょう。",text:"兌。亨、利貞。\n\n兌は亨る、貞しきに利ろし。"},
+  "風水渙":{overall:"散らばることを象徴する卦。風が水面を吹き、波立てて散らすように、停滞や凝り固まったものを解消する時期を示しています。",work:"停滞を打破し、新しい風を入れましょう。",love:"マンネリを解消し、新鮮な関係を築く時期。",health:"滞りを解消し、巡りを良くすることが大切。",text:""},
+  "水沢節":{overall:"節度を象徴する卦。沢の水が限られているように、節度と制限の大切さを説いています。度を越さない節制が、長続きする発展をもたらします。\n\n節度が大切だが、厳しすぎる制限は長続きしない。",work:"予算や時間の節制が必要。無駄を省きましょう。",love:"適度な距離感が大切。束縛しすぎず、自由すぎず。",health:"節制が健康の鍵。ただし厳しすぎる制限は禁物。",text:"節。亨。苦節不可貞。\n\n節は亨る。苦節は貞にすべからず。"},
+  "風沢中孚":{overall:"内なる誠実さを象徴する卦。卵の中の雛のように、内に真実を抱く状態。誠実さが人を動かし、困難も乗り越えられることを説いています。\n\n誠実さは豚や魚のような小さなものにも通じる。真心があれば大事も成せる。",work:"誠意を持って取り組めば、困難も乗り越えられます。",love:"誠実な心が相手に伝わる時期。信頼関係が深まります。",health:"心からの養生が効果を発揮する時期。",text:"中孚。豚魚吉。利渉大川、利貞。\n\n中孚は豚魚にも吉なり。大川を渉るに利ろし、貞しきに利ろし。"},
+  "雷山小過":{overall:"小さく過ぎることを象徴する卦。鳥が低く飛ぶように、大きなことは避け、小さなことで満足すべき時期。謙虚に控えめに行動しましょう。\n\n大きなことより小さなことを大切に。控えめに行動すれば吉。",work:"小さな仕事を丁寧にこなす時期。大きな野心は控えめに。",love:"控えめなアプローチが吉。大きな動きは避けましょう。",health:"無理をせず、小さなことからコツコツと健康管理を。",text:"小過。亨、利貞。可小事、不可大事。飛鳥遺之音。不宜上、宜下。大吉。\n\n小過は亨り貞しきに利ろし。小事に可なり、大事に不可なり。飛鳥これが音を遺す。上るに宜しからず、下るに宜し。大吉なり。"},
+  "水火既済":{overall:"すでに済んだことを象徴する卦。水と火が正しい位置にあり、すべてが整った状態。しかし、完成の後には衰退の兆しもあり、油断は禁物です。\n\n完成の時だが、ここからが大切。気を緩めず、維持に努めましょう。",work:"プロジェクトが完成。しかし、維持管理が次の課題。",love:"関係が安定した状態。しかし、マンネリに注意。",health:"現状は良いが、油断すると崩れやすい。継続的な管理を。",text:"既濟。亨小、利貞。初吉終亂。\n\n既済は小しく亨る、貞しきに利ろし。初めは吉なれど終わりは乱る。"},
+  "火水未済":{overall:"まだ済んでいないことを象徴する卦。火と水が離れ、まだ調和していない状態。しかし、これから成し遂げる可能性を秘めた希望の卦でもあります。\n\nまだ完成していないが、可能性は無限。慎重に、最後まで気を抜かずに。",work:"まだ道半ば。最後まで気を抜かず、完成を目指しましょう。",love:"関係はまだ発展途上。焦らず育てていきましょう。",health:"まだ完全ではないが、希望を持って取り組みましょう。",text:"未濟。亨。小狐汔濟、濡其尾、无攸利。\n\n未済は亨る。小狐ほとんど済らんとして、その尾を濡らす、利ろしきところなし。"}
+};
+function formatMeaningText(text){
+  if(!text) return "未登録";
+  return String(text).split("\\n").map(function(line){return line.trim();}).filter(Boolean).join("<br>");
+}
+function renderMeaningCard(title, hex){
+  if(!hex) return "";
+  var data=HEX_MEANINGS[hex.name];
+  if(!data){
+    return '<div class="hex-meaning-card"><h3>'+title+'：'+hex.name+'</h3><p class="small">この卦の意味は未登録です。後から追加できます。</p></div>';
+  }
+  return '<div class="hex-meaning-card">'
+    + '<h3>'+title+'：'+hex.name+'</h3>'
+    + '<div class="meaning-section"><strong>総合</strong><p>'+formatMeaningText(data.overall)+'</p></div>'
+    + '<div class="meaning-section"><strong>仕事・事業</strong><p>'+formatMeaningText(data.work)+'</p></div>'
+    + '<div class="meaning-section"><strong>恋愛・結婚</strong><p>'+formatMeaningText(data.love)+'</p></div>'
+    + '<div class="meaning-section"><strong>健康</strong><p>'+formatMeaningText(data.health)+'</p></div>'
+    + '<div class="meaning-section"><strong>卦辞</strong><p>'+formatMeaningText(data.text)+'</p></div>'
+    + '</div>';
+}
+function renderHexMeanings(mainHex, changedHex){
+  var el=document.getElementById("hexMeaningArea");
+  if(!el) return;
+  if(!mainHex){
+    el.innerHTML='<p class="small">六爻を入力すると、本卦と変卦の意味を表示します。</p>';
+    return;
+  }
+  el.innerHTML=renderMeaningCard("本卦", mainHex) + (changedHex ? renderMeaningCard("変卦", changedHex) : "");
+}
+
 function render(){
-  ["readingDate","clientName","question","useGod","memo","resultMemo"].forEach(id=>document.getElementById(id).value=record[id]||"");
+  ensureLineMemos();
+  ["readingDate","clientName","question","useGod","genre","memo","resultMemo"].forEach(id=>document.getElementById(id).value=record[id]||"");
   document.getElementById("monthBranch").value=record.calendar.monthBranch;
   document.getElementById("dayStem").value=record.calendar.dayStem;
   document.getElementById("dayBranch").value=record.calendar.dayBranch;
@@ -735,7 +956,8 @@ function render(){
   const useCtx=getUseContext(computed);
   const scoreCtx=getElementScores(record.calendar);
   const tombCtx=getTombContext(computed.lines);
-  const rows=[...computed.lines].reverse().map(line=>{
+  const renderLines = (computed.lines && computed.lines.length) ? computed.lines : buildBlankDisplayLines(record.inputSymbols);
+  const rows=[...renderLines].reverse().map(line=>{
     const idx=line.position-1;
     const hiddenRole=getRoleTag("hidden", line.hiddenSpirit, line.position, computed, useCtx);
     const mainRole=getRoleTag("main", line.mainLine, line.position, computed, useCtx);
@@ -784,14 +1006,17 @@ function render(){
       </td>
       <td>${cellHtml(changedRole,line.changedLine.branchWithElement,line.changedLine.markers,scoreCtx,changedExtras,changedSourceClass)}</td>
       <td>${line.changedLine.sixRelative}</td>
+      <td><textarea class="row-memo" data-memo-idx="${idx}">${record.lineMemos[idx]||""}</textarea></td>
     </tr>`;
   }).join("");
   document.getElementById("lineTable").innerHTML=rows;
   document.querySelectorAll(".line-select").forEach(sel=>sel.addEventListener("change",e=>{record.inputSymbols[Number(e.target.dataset.idx)]=e.target.value; render();}));
+  document.querySelectorAll(".row-memo").forEach(function(el){el.addEventListener("input",function(e){record.lineMemos[Number(e.target.dataset.memoIdx)]=e.target.value;});});
   document.getElementById("palaceCell").textContent=(computed.mainHex && computed.mainHex.palace)||"";
   document.getElementById("mainHexCell").textContent=computed.mainHex?computed.mainHex.name+(computed.mainHex.tags.length?`（${computed.mainHex.tags.join("・")}）`:""):"";
   document.getElementById("changedHexCell").textContent=computed.changedHex?computed.changedHex.name+(computed.changedHex.tags.length?`（${computed.changedHex.tags.join("・")}）`:""):"";
   renderFigure(computed, useCtx, scoreCtx);
+  renderHexMeanings(computed.mainHex, computed.changedHex);
   renderSaved();
 }
 function renderSaved(){
@@ -802,6 +1027,7 @@ function renderSaved(){
   list.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{saved=saved.filter(r=>r.id!==b.dataset.del); saveStorage(); renderSaved();});
 }
 fillSelect("useGod",USE_GOD_OPTIONS,false);
+fillSelect("genre",GENRE_OPTIONS,false);
 ["monthBranch","dayBranch","void1","void2"].forEach(id=>fillSelect(id,BRANCHES,true));
 fillSelect("dayStem",STEMS,true);
 loadStorage();
