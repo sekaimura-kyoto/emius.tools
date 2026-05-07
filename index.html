@@ -80,12 +80,13 @@
     .primary{background:#222;color:#fff;}
     .danger{background:#ffe1e1;color:#b40000;}
     .saved-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #ddd;border-radius:10px;padding:10px;margin-top:8px;}
-    .direction-table-wrap{margin-top:16px;overflow-x:auto;}
-    .direction-table{min-width:980px;font-size:12px;}
+    .main-extra-sections{margin-top:16px;}
+    .direction-table-wrap{margin-top:16px;overflow-x:auto;width:100%;}
+    .direction-table{width:100%;min-width:980px;font-size:12px;}
     .direction-table th,.direction-table td{height:auto;padding:7px 5px;}
-    .meaning-box{margin-top:16px;border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff;}
+    .meaning-box{margin-top:16px;border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff;width:100%;box-sizing:border-box;}
     .meaning-box h2{margin:0 0 10px;font-size:18px;}
-    .hex-meaning-area{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .hex-meaning-area{display:grid;grid-template-columns:1fr;gap:12px;width:100%;}
     .hex-meaning-card{border:1px solid #ddd;border-radius:10px;padding:10px;background:#fafafa;}
     .hex-meaning-card h3{margin:0 0 8px;color:#b40000;}
     .meaning-section{margin:8px 0;}
@@ -103,7 +104,24 @@
       .grid,.grid5,.info-row{grid-template-columns:1fr;}
       .wrap{padding:10px;}
     }
-  </style>
+  
+    .figure-card{display:block;width:100%;box-sizing:border-box;}
+    .figure-area{width:100%;min-height:260px;display:block;}
+    .figure-area svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto;}
+
+
+    .figure-card{display:block !important;width:100% !important;box-sizing:border-box !important;clear:both !important;}
+    .figure-area{display:block !important;width:100% !important;min-height:360px !important;overflow:visible !important;}
+    .figure-area svg{display:block !important;width:100% !important;max-width:560px !important;height:auto !important;margin:0 auto !important;overflow:visible !important;}
+    #figureCard{visibility:visible !important;opacity:1 !important;}
+
+
+    #figureCard{margin-top:0 !important;margin-bottom:12px !important;}
+    #figureCard .legend{font-size:12px;color:#666;}
+    .figure-area{min-height:300px !important;}
+    .figure-area svg{max-width:500px !important;}
+
+</style>
 <script>
 window.onerror=function(msg, url, line, col, err){
   var box=document.getElementById("errorBox");
@@ -115,7 +133,8 @@ window.onerror=function(msg, url, line, col, err){
 </script>
 </head>
 <body>
-<div class="wrap"><div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
+<div class="wrap">
+<div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
   <div class="card">
     <h1>六爻 納爻自動ツール メモ欄追加版</h1>
     <p class="note">iPhoneでも使用できます。表は横長なので、iPhoneでは横スクロール前提です。黄色セルを入力すると、世応・六神・地支・六親・伏神・空亡・月破・月合・日破・日合・用/元/忌/仇・一部の発動種別を表示します。</p>
@@ -160,13 +179,18 @@ window.onerror=function(msg, url, line, col, err){
           <div class="info" id="voidInfo">空亡：</div>
         </div>
       </div>
-      <div class="figure-box">
-        <div class="figure-title">図1　五行・六親の関係</div>
-        <div id="figureArea"></div>
-        <div class="small">黒：六親／青：用・元・忌・仇／🌙月・☀️日／数字：五行点</div>
-      </div>
     </div>
   </div>
+
+  
+  <div class="card figure-card" id="figureCard">
+    <h2>図1　五行・六親の関係</h2>
+    <div id="figureArea" class="figure-area">
+      <div class="small">卦が確定すると図を表示します。</div>
+    </div>
+    <div class="legend">黒：六親／青：用・元・忌・仇／🌙月・☀️日／数字：五行点</div>
+  </div>
+
 
   <div class="card scroll">
     <table>
@@ -206,20 +230,25 @@ window.onerror=function(msg, url, line, col, err){
       <div class="red" id="palaceCell"></div>
       <div class="red" id="mainHexCell"></div>
       <div class="red" id="changedHexCell"></div>
-    
-    <div class="direction-table-wrap">
-      <table class="direction-table">
-        <tr><th>子水</th><th>丑土</th><th>寅木</th><th>卯木</th><th>辰土</th><th>巳火</th><th>午火</th><th>未土</th><th>申金</th><th>酉金</th><th>戌土</th><th>亥水</th></tr>
-        <tr><td>北</td><td>北北東</td><td>東北東</td><td>東</td><td>東南東</td><td>南南東</td><td>南</td><td>南南西</td><td>西南西</td><td>西</td><td>西北西</td><td>北北西</td></tr>
-        <tr><td>23:00~1:00</td><td>1:00~3:00</td><td>3:00~5:00</td><td>5:00~7:00</td><td>7:00~9:00</td><td>9:00~11:00</td><td>11:00~13:00</td><td>13:00~15:00</td><td>15:00~17:00</td><td>17:00~19:00</td><td>19:00~21:00</td><td>21:00~23:00</td></tr>
-      </table>
-    </div>
-    <div class="meaning-box">
-      <h2>64卦の意味</h2>
-      <div id="hexMeaningArea" class="hex-meaning-area"></div>
     </div>
 
   </div>
+
+  
+    <div class="main-extra-sections">
+      <div class="meaning-box">
+        <h2>六十四卦の意味</h2>
+        <div id="hexMeaningArea" class="hex-meaning-area"></div>
+      </div>
+
+      <div class="direction-table-wrap">
+        <table class="direction-table">
+          <tr><th>子水</th><th>丑土</th><th>寅木</th><th>卯木</th><th>辰土</th><th>巳火</th><th>午火</th><th>未土</th><th>申金</th><th>酉金</th><th>戌土</th><th>亥水</th></tr>
+          <tr><td>北</td><td>北北東</td><td>東北東</td><td>東</td><td>東南東</td><td>南南東</td><td>南</td><td>南南西</td><td>西南西</td><td>西</td><td>西北西</td><td>北北西</td></tr>
+          <tr><td>23:00~1:00</td><td>1:00~3:00</td><td>3:00~5:00</td><td>5:00~7:00</td><td>7:00~9:00</td><td>9:00~11:00</td><td>11:00~13:00</td><td>13:00~15:00</td><td>15:00~17:00</td><td>17:00~19:00</td><td>19:00~21:00</td><td>21:00~23:00</td></tr>
+        </table>
+      </div>
+    </div>
 
   <div class="card">
     <label>結果メモ・後日検証メモ
@@ -852,9 +881,19 @@ function formatMeaningText(text){
   if(!text) return "未登録";
   return String(text).split("\\n").map(function(line){return line.trim();}).filter(Boolean).join("<br>");
 }
+function normalizeHexNameForMeaning(name){
+  if(!name) return "";
+  var map={
+    "雷地余":"雷地予",
+    "水火既成":"水火既済"
+  };
+  return map[name] || name;
+}
+
 function renderMeaningCard(title, hex){
   if(!hex) return "";
-  var data=HEX_MEANINGS[hex.name];
+  var meaningName=normalizeHexNameForMeaning(hex.name);
+  var data=HEX_MEANINGS[meaningName];
   if(!data){
     return '<div class="hex-meaning-card"><h3>'+title+'：'+hex.name+'</h3><p class="small">この卦の意味は未登録です。後から追加できます。</p></div>';
   }
@@ -875,6 +914,30 @@ function renderHexMeanings(mainHex, changedHex){
     return;
   }
   el.innerHTML=renderMeaningCard("本卦", mainHex) + (changedHex ? renderMeaningCard("変卦", changedHex) : "");
+}
+
+
+function renderStaticFigureFallback(){
+  var el=document.getElementById("figureArea");
+  if(!el) return;
+  if(el.querySelector && el.querySelector("svg")) return;
+  el.innerHTML='<svg width="100%" viewBox="0 0 470 430" xmlns="http://www.w3.org/2000/svg">'
+  +'<line x1="230" y1="118" x2="338" y2="200" stroke="#222" stroke-width="2"/>'
+  +'<line x1="338" y1="200" x2="290" y2="318" stroke="#222" stroke-width="2"/>'
+  +'<line x1="290" y1="318" x2="170" y2="318" stroke="#222" stroke-width="2"/>'
+  +'<line x1="170" y1="318" x2="122" y2="200" stroke="#222" stroke-width="2"/>'
+  +'<line x1="122" y1="200" x2="230" y2="118" stroke="#222" stroke-width="2"/>'
+  +'<line x1="230" y1="118" x2="290" y2="318" stroke="#222" stroke-width="1.8"/>'
+  +'<line x1="290" y1="318" x2="122" y2="200" stroke="#222" stroke-width="1.8"/>'
+  +'<line x1="122" y1="200" x2="338" y2="200" stroke="#222" stroke-width="1.8"/>'
+  +'<line x1="338" y1="200" x2="170" y2="318" stroke="#222" stroke-width="1.8"/>'
+  +'<line x1="170" y1="318" x2="230" y2="118" stroke="#222" stroke-width="1.8"/>'
+  +'<circle cx="230" cy="118" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="230" y="125" text-anchor="middle" font-size="20">木</text>'
+  +'<circle cx="338" cy="200" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="338" y="207" text-anchor="middle" font-size="20">火</text>'
+  +'<circle cx="290" cy="318" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="290" y="325" text-anchor="middle" font-size="20">土</text>'
+  +'<circle cx="170" cy="318" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="170" y="325" text-anchor="middle" font-size="20">金</text>'
+  +'<circle cx="122" cy="200" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="122" y="207" text-anchor="middle" font-size="20">水</text>'
+  +'</svg>';
 }
 
 function render(){
@@ -955,6 +1018,7 @@ function render(){
   document.getElementById("changedHexCell").textContent=computed.changedHex?computed.changedHex.name+(computed.changedHex.tags.length?`（${computed.changedHex.tags.join("・")}）`:""):"";
   renderFigure(computed, useCtx, scoreCtx);
   renderHexMeanings(computed.mainHex, computed.changedHex);
+  renderStaticFigureFallback();
   renderSaved();
 }
 function renderSaved(){
