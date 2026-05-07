@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>六爻 納爻自動ツール 安定修正版</title>
+  <title>六爻 納爻自動ツール 完全復旧版2</title>
   <style>
     :root{
       --border:#555;
@@ -122,9 +122,10 @@ window.onerror=function(msg, url, line, col, err){
 </script>
 </head>
 <body>
-<div class="wrap"><div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
+<div class="wrap"><div id="startupStatus" style="background:#eef7ff;color:#245;border:1px solid #9cc;border-radius:8px;padding:8px;margin-bottom:10px;font-size:13px;">起動確認中...</div>
+<div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
   <div class="card">
-    <h1>六爻 納爻自動ツール 安定修正版</h1>
+    <h1>六爻 納爻自動ツール 完全復旧版2</h1>
     <p class="note">iPhoneでも使用できます。表は横長なので、iPhoneでは横スクロール前提です。黄色セルを入力すると、世応・六神・地支・六親・伏神・空亡・月破・月合・日破・日合・用/元/忌/仇・一部の発動種別を表示します。</p>
   </div>
 
@@ -169,6 +170,11 @@ window.onerror=function(msg, url, line, col, err){
       </div>
     </div>
   </div>
+    <div class="legend">黒：六親／青：用・元・忌・仇／赤：世／🌙月・☀️日／数字：五行点</div>
+  </div>
+
+
+  
 
   
   <div class="card figure-card" id="figureCard">
@@ -176,9 +182,6 @@ window.onerror=function(msg, url, line, col, err){
     <div id="figureArea" class="figure-area">
       <div class="small">卦が確定すると図を表示します。</div>
     </div>
-    <div class="legend">黒：六親／青：用・元・忌・仇／赤：世／🌙月・☀️日／数字：五行点</div>
-  </div>
-
 
   <div class="card scroll">
     <table>
@@ -403,8 +406,9 @@ function computeMotionKinds(mainBranch, changedBranch, position, mainNa){
   return [...new Set(kinds.filter(Boolean))];
 }
 function buildDisplayLines(inputSymbols,cal){
-  const baseBits=inputSymbols.map(s=>symbolToLine(s).bit).join("");
-  if(baseBits.length!==6 || baseBits.indexOf("")!==-1){return {mainHex:null,changedHex:null,lines:[]};}
+  const baseBitArr=inputSymbols.map(s=>symbolToLine(s).bit);
+  if(baseBitArr.some(b=>b==="")){return {mainHex:null,changedHex:null,lines:[]};}
+  const baseBits=baseBitArr.join("");
   const changedBits=inputSymbols.map(s=>{const l=symbolToLine(s); return l.isMoving?(l.bit==="1"?"0":"1"):l.bit;}).join("");
   const mainHex=hexByBits[baseBits];
   const hasMoving=inputSymbols.some(s=>symbolToLine(s).isMoving);
@@ -463,7 +467,7 @@ function saveStorage(){localStorage.setItem("liuyao_records_v2",JSON.stringify(s
 
 function getUseContext(computed){
   const hex=computed.mainHex;
-  if(!hex) return {useElement:"", useRelative:"", useMode:"", palaceElement:""};
+  if(!hex) return {useElement:"", useRelative:"", useMode:"", palaceElement:"", yuanElement:"", jiElement:"", chouElement:""};
   const palaceElement=hex.palaceElement;
   let useElement="", useRelative="", useMode="";
   if(record.useGod==="世爻"){
@@ -550,42 +554,43 @@ function getRoleTag(kind, data, position, computed, ctx){
   return "";
 }
 function renderFigure(computed, ctx, scoreCtx){
-  const palaceElement=(computed.mainHex && computed.mainHex.palaceElement);
-  if(!palaceElement){
-    document.getElementById("figureArea").innerHTML='<div class="small">卦が確定すると図を表示します。</div>';
-    return;
-  }
-  const relMap=relativeByPalaceElement[palaceElement];
+  var target=document.getElementById("figureArea");
+  if(!target) return;
 
-  // 五芒星の形を崩さない固定座標
-  const pts={
+  var palaceElement=(computed.mainHex && computed.mainHex.palaceElement) || "";
+  var relMap=palaceElement ? (relativeByPalaceElement[palaceElement] || {}) : {};
+
+  // 五芒星は、卦が未完成でも常に表示する
+  var pts={
     木:[230,118], 火:[338,200], 土:[290,318], 金:[170,318], 水:[122,200]
   };
-  const order=["木","火","土","金","水"];
-  const nodeRole = el => {
-    if(!ctx.useElement) return "";
+  var order=["木","火","土","金","水"];
+
+  function nodeRole(el){
+    if(!ctx || !ctx.useElement) return "";
     if(el===ctx.useElement) return "用";
     if(el===ctx.yuanElement) return "元";
     if(el===ctx.jiElement) return "忌";
     if(el===ctx.chouElement) return "仇";
     return "";
-  };
+  }
 
-  const shiLine = computed.lines.find(function(l){return computed.mainHex && l.position===computed.mainHex.shiLine;});
-  const shiElementForFigure = parseElement(shiLine && shiLine.mainLine ? shiLine.mainLine.branchWithElement : "");
+  var shiElementForFigure="";
+  if(computed.mainHex && computed.lines && computed.lines.length){
+    var shiLine=computed.lines.find(function(l){return l.position===computed.mainHex.shiLine;});
+    shiElementForFigure=parseElement(shiLine && shiLine.mainLine ? shiLine.mainLine.branchWithElement : "");
+  }
 
-  const linesCircle = [["木","火"],["火","土"],["土","金"],["金","水"],["水","木"]]
-    .map(([a,b])=>`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="#222" stroke-width="2" marker-end="url(#arr)"/>`).join("");
-  const star = [["木","土"],["土","水"],["水","火"],["火","金"],["金","木"]]
-    .map(([a,b])=>`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="#222" stroke-width="1.8" marker-end="url(#arr2)"/>`).join("");
+  var linesCircle=[["木","火"],["火","土"],["土","金"],["金","水"],["水","木"]]
+    .map(function(pair){var a=pair[0], b=pair[1]; return '<line x1="'+pts[a][0]+'" y1="'+pts[a][1]+'" x2="'+pts[b][0]+'" y2="'+pts[b][1]+'" stroke="#222" stroke-width="2" marker-end="url(#arr)"/>';}).join("");
+  var star=[["木","土"],["土","水"],["水","火"],["火","金"],["金","木"]]
+    .map(function(pair){var a=pair[0], b=pair[1]; return '<line x1="'+pts[a][0]+'" y1="'+pts[a][1]+'" x2="'+pts[b][0]+'" y2="'+pts[b][1]+'" stroke="#222" stroke-width="1.8" marker-end="url(#arr2)"/>';}).join("");
 
-  const nodes = order.map(el=>{
-    const [x,y]=pts[el];
-    const role=nodeRole(el);
-    const rel=relMap[el]||"";
-
-    // 六親は丸の近く。☀️/🌙・点数・用/元/忌/仇 は横並び。
-    const cfg = {
+  var nodes=order.map(function(el){
+    var x=pts[el][0], y=pts[el][1];
+    var role=nodeRole(el);
+    var rel=relMap[el]||"";
+    var cfg={
       木:{rel:[36,7], astro:[-22,-38], score:[0,-38], role:[22,-38]},
       火:{rel:[0,-26], astro:[34,7], score:[56,7], role:[78,7]},
       土:{rel:[36,7], astro:[-16,38], score:[0,38], role:[22,38]},
@@ -593,35 +598,27 @@ function renderFigure(computed, ctx, scoreCtx){
       水:{rel:[0,-26], astro:[-78,7], score:[-56,7], role:[-34,7]}
     }[el];
 
-    const score = scoreText(el, scoreCtx);
-    const astro = `${scoreCtx.monthElement===el?"🌙":""}${scoreCtx.dayElement===el?"☀️":""}`;
-    const scoreLabel = score ? `${score}` : "";
-    const seLabel = shiElementForFigure===el ? "世" : "";
-    return `
-      <circle cx="${x}" cy="${y}" r="20" fill="#fff" stroke="#222" stroke-width="2"></circle>
-      <text x="${x}" y="${y+7}" text-anchor="middle" class="svgtxt" font-size="20">${el}</text>
-      ${seLabel?`<text x="${x-24}" y="${y-20}" text-anchor="middle" class="svgtxt" font-size="20" fill="#d40000" font-weight="700">${seLabel}</text>`:""}
-      <text x="${x+cfg.rel[0]}" y="${y+cfg.rel[1]}" text-anchor="middle" class="svgtxt" font-size="24" fill="#222">${rel}</text>
-      ${astro?`<text x="${x+cfg.astro[0]}" y="${y+cfg.astro[1]}" text-anchor="middle" class="svgtxt astro" font-size="24">${astro}</text>`:""}
-      ${scoreLabel?`<text x="${x+cfg.score[0]}" y="${y+cfg.score[1]}" text-anchor="middle" class="svgtxt" font-size="22" fill="#555">${scoreLabel}</text>`:""}
-      ${role?`<text x="${x+cfg.role[0]}" y="${y+cfg.role[1]}" text-anchor="middle" class="svgtxt" font-size="20" fill="#2a70c9">${role}</text>`:""}
-    `;
+    var score=scoreText(el, scoreCtx);
+    var astro=((scoreCtx.monthElement===el)?"🌙":"")+((scoreCtx.dayElement===el)?"☀️":"");
+    var scoreLabel=score ? score : "";
+    var seLabel=shiElementForFigure===el ? "世" : "";
+
+    return ''
+      +'<circle cx="'+x+'" cy="'+y+'" r="20" fill="#fff" stroke="#222" stroke-width="2"></circle>'
+      +'<text x="'+x+'" y="'+(y+7)+'" text-anchor="middle" class="svgtxt" font-size="20">'+el+'</text>'
+      +(seLabel?'<text x="'+(x-24)+'" y="'+(y-20)+'" text-anchor="middle" class="svgtxt" font-size="20" fill="#d40000" font-weight="700">'+seLabel+'</text>':'')
+      +'<text x="'+(x+cfg.rel[0])+'" y="'+(y+cfg.rel[1])+'" text-anchor="middle" class="svgtxt" font-size="24" fill="#222">'+rel+'</text>'
+      +(astro?'<text x="'+(x+cfg.astro[0])+'" y="'+(y+cfg.astro[1])+'" text-anchor="middle" class="svgtxt astro" font-size="24">'+astro+'</text>':'')
+      +(scoreLabel?'<text x="'+(x+cfg.score[0])+'" y="'+(y+cfg.score[1])+'" text-anchor="middle" class="svgtxt" font-size="22" fill="#555">'+scoreLabel+'</text>':'')
+      +(role?'<text x="'+(x+cfg.role[0])+'" y="'+(y+cfg.role[1])+'" text-anchor="middle" class="svgtxt" font-size="20" fill="#2a70c9">'+role+'</text>':'');
   }).join("");
 
-  document.getElementById("figureArea").innerHTML = `
-    <svg width="100%" viewBox="0 0 470 430" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#222"/>
-        </marker>
-        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#222"/>
-        </marker>
-      </defs>
-      ${linesCircle}
-      ${star}
-      ${nodes}
-    </svg>`;
+  target.innerHTML=''
+    +'<svg width="100%" viewBox="0 0 470 430" xmlns="http://www.w3.org/2000/svg">'
+    +'<defs>'
+    +'<marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#222"/></marker>'
+    +'<marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#222"/></marker>'
+    +'</defs>'+linesCircle+star+nodes+'</svg>';
 }
 function bindInputs(){
   ["readingDate","clientName","question","useGod","genre","memo","resultMemo"].forEach(id=>{
@@ -904,8 +901,7 @@ function renderHexMeanings(mainHex, changedHex){
   el.innerHTML=renderMeaningCard("本卦", mainHex) + (changedHex ? renderMeaningCard("変卦", changedHex) : "");
 }
 
-function render(){
-  ensureLineMemos();
+function renderCore(){
   ensureLineMemos();
   ["readingDate","clientName","question","useGod","genre","memo","resultMemo"].forEach(id=>document.getElementById(id).value=record[id]||"");
   document.getElementById("monthBranch").value=record.calendar.monthBranch;
@@ -984,6 +980,31 @@ function render(){
   renderFigure(computed, useCtx, scoreCtx);
   renderHexMeanings(computed.mainHex, computed.changedHex);
   renderSaved();
+}
+function render(){
+  var status=document.getElementById("startupStatus");
+  var box=document.getElementById("errorBox");
+  try{
+    renderCore();
+    if(status){
+      status.style.display="block";
+      status.textContent="起動OK：完全復旧版2が読み込まれています";
+    }
+    if(box){
+      box.style.display="none";
+      box.textContent="";
+    }
+  }catch(err){
+    if(status){
+      status.style.display="block";
+      status.textContent="起動しましたが描画で停止しました";
+    }
+    if(box){
+      box.style.display="block";
+      box.textContent="描画エラー: "+(err && err.message ? err.message : err);
+    }
+    console.error(err);
+  }
 }
 function renderSaved(){
   const list=document.getElementById("savedList");
