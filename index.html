@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>六爻 納爻自動ツール メモ欄追加版</title>
+  <title>六爻 納爻自動ツール 安定修正版</title>
   <style>
     :root{
       --border:#555;
@@ -105,21 +105,10 @@
       .wrap{padding:10px;}
     }
   
-    .figure-card{display:block;width:100%;box-sizing:border-box;}
-    .figure-area{width:100%;min-height:260px;display:block;}
-    .figure-area svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto;}
-
-
-    .figure-card{display:block !important;width:100% !important;box-sizing:border-box !important;clear:both !important;}
-    .figure-area{display:block !important;width:100% !important;min-height:360px !important;overflow:visible !important;}
-    .figure-area svg{display:block !important;width:100% !important;max-width:560px !important;height:auto !important;margin:0 auto !important;overflow:visible !important;}
-    #figureCard{visibility:visible !important;opacity:1 !important;}
-
-
-    #figureCard{margin-top:0 !important;margin-bottom:12px !important;}
-    #figureCard .legend{font-size:12px;color:#666;}
-    .figure-area{min-height:300px !important;}
-    .figure-area svg{max-width:500px !important;}
+    .figure-card{display:block !important;width:100% !important;box-sizing:border-box !important;margin-bottom:12px !important;}
+    .figure-area{display:block !important;width:100% !important;min-height:300px !important;overflow:visible !important;}
+    .figure-area svg{display:block !important;width:100% !important;max-width:500px !important;height:auto !important;margin:0 auto !important;overflow:visible !important;}
+    .row-memo{width:100%;min-height:34px;height:38px;margin:0;background:#fffef0;border:1px solid #ccc;border-radius:6px;padding:4px;font-size:12px;resize:vertical;box-sizing:border-box;}
 
 </style>
 <script>
@@ -133,10 +122,9 @@ window.onerror=function(msg, url, line, col, err){
 </script>
 </head>
 <body>
-<div class="wrap">
-<div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
+<div class="wrap"><div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
   <div class="card">
-    <h1>六爻 納爻自動ツール メモ欄追加版</h1>
+    <h1>六爻 納爻自動ツール 安定修正版</h1>
     <p class="note">iPhoneでも使用できます。表は横長なので、iPhoneでは横スクロール前提です。黄色セルを入力すると、世応・六神・地支・六親・伏神・空亡・月破・月合・日破・日合・用/元/忌/仇・一部の発動種別を表示します。</p>
   </div>
 
@@ -188,7 +176,7 @@ window.onerror=function(msg, url, line, col, err){
     <div id="figureArea" class="figure-area">
       <div class="small">卦が確定すると図を表示します。</div>
     </div>
-    <div class="legend">黒：六親／青：用・元・忌・仇／🌙月・☀️日／数字：五行点</div>
+    <div class="legend">黒：六親／青：用・元・忌・仇／赤：世／🌙月・☀️日／数字：五行点</div>
   </div>
 
 
@@ -916,31 +904,8 @@ function renderHexMeanings(mainHex, changedHex){
   el.innerHTML=renderMeaningCard("本卦", mainHex) + (changedHex ? renderMeaningCard("変卦", changedHex) : "");
 }
 
-
-function renderStaticFigureFallback(){
-  var el=document.getElementById("figureArea");
-  if(!el) return;
-  if(el.querySelector && el.querySelector("svg")) return;
-  el.innerHTML='<svg width="100%" viewBox="0 0 470 430" xmlns="http://www.w3.org/2000/svg">'
-  +'<line x1="230" y1="118" x2="338" y2="200" stroke="#222" stroke-width="2"/>'
-  +'<line x1="338" y1="200" x2="290" y2="318" stroke="#222" stroke-width="2"/>'
-  +'<line x1="290" y1="318" x2="170" y2="318" stroke="#222" stroke-width="2"/>'
-  +'<line x1="170" y1="318" x2="122" y2="200" stroke="#222" stroke-width="2"/>'
-  +'<line x1="122" y1="200" x2="230" y2="118" stroke="#222" stroke-width="2"/>'
-  +'<line x1="230" y1="118" x2="290" y2="318" stroke="#222" stroke-width="1.8"/>'
-  +'<line x1="290" y1="318" x2="122" y2="200" stroke="#222" stroke-width="1.8"/>'
-  +'<line x1="122" y1="200" x2="338" y2="200" stroke="#222" stroke-width="1.8"/>'
-  +'<line x1="338" y1="200" x2="170" y2="318" stroke="#222" stroke-width="1.8"/>'
-  +'<line x1="170" y1="318" x2="230" y2="118" stroke="#222" stroke-width="1.8"/>'
-  +'<circle cx="230" cy="118" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="230" y="125" text-anchor="middle" font-size="20">木</text>'
-  +'<circle cx="338" cy="200" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="338" y="207" text-anchor="middle" font-size="20">火</text>'
-  +'<circle cx="290" cy="318" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="290" y="325" text-anchor="middle" font-size="20">土</text>'
-  +'<circle cx="170" cy="318" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="170" y="325" text-anchor="middle" font-size="20">金</text>'
-  +'<circle cx="122" cy="200" r="20" fill="#fff" stroke="#222" stroke-width="2"/><text x="122" y="207" text-anchor="middle" font-size="20">水</text>'
-  +'</svg>';
-}
-
 function render(){
+  ensureLineMemos();
   ensureLineMemos();
   ["readingDate","clientName","question","useGod","genre","memo","resultMemo"].forEach(id=>document.getElementById(id).value=record[id]||"");
   document.getElementById("monthBranch").value=record.calendar.monthBranch;
@@ -1007,7 +972,7 @@ function render(){
       </td>
       <td>${cellHtml(changedRole,line.changedLine.branchWithElement,line.changedLine.markers,scoreCtx,changedExtras,changedSourceClass)}</td>
       <td>${line.changedLine.sixRelative}</td>
-      <td><textarea class="row-memo" data-memo-idx="${idx}">${record.lineMemos[idx]||""}</textarea></td>
+      <td><textarea class="row-memo" data-memo-idx="${line.position-1}">${record.lineMemos[line.position-1]||""}</textarea></td>
     </tr>`;
   }).join("");
   document.getElementById("lineTable").innerHTML=rows;
@@ -1018,7 +983,6 @@ function render(){
   document.getElementById("changedHexCell").textContent=computed.changedHex?computed.changedHex.name+(computed.changedHex.tags.length?`（${computed.changedHex.tags.join("・")}）`:""):"";
   renderFigure(computed, useCtx, scoreCtx);
   renderHexMeanings(computed.mainHex, computed.changedHex);
-  renderStaticFigureFallback();
   renderSaved();
 }
 function renderSaved(){
