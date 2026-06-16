@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>六爻 納爻自動ツール 地支欄整理版</title>
+  <title>六爻 納爻自動ツール コイン1爻ずつ版</title>
   <style>
     :root{
       --border:#555;
@@ -185,6 +185,20 @@
       font-size:11px !important;
     }
 
+
+    .cast-panel{margin-top:12px;border:1px dashed #bbb;border-radius:12px;padding:12px;background:#fbfbfb;}
+    .cast-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+    .mode-toggle{display:inline-flex;border:1px solid #bbb;border-radius:999px;overflow:hidden;background:#fff;}
+    .mode-toggle button{border:0;border-right:1px solid #ddd;background:#fff;padding:8px 12px;cursor:pointer;}
+    .mode-toggle button:last-child{border-right:0;}
+    .mode-toggle button.active{background:#fff4a8;font-weight:800;}
+    .coin-results{display:grid;grid-template-columns:repeat(6,minmax(92px,1fr));gap:8px;}
+    .coin-cast{border:1px solid #ddd;border-radius:10px;background:#fff;padding:8px;font-size:12px;}
+    .coin-cast strong{display:block;margin-bottom:4px;color:#8a4b00;}
+    .coin-row{font-size:18px;letter-spacing:2px;margin:4px 0;}
+    .coin-symbol{font-weight:800;font-size:18px;}
+    @media (max-width:760px){.coin-results{grid-template-columns:repeat(2,minmax(120px,1fr));}}
+
 </style>
 <script>
 window.onerror=function(msg, url, line, col, err){
@@ -200,7 +214,7 @@ window.onerror=function(msg, url, line, col, err){
 <div class="wrap"><div id="startupStatus" style="background:#eef7ff;color:#245;border:1px solid #9cc;border-radius:8px;padding:8px;margin-bottom:10px;font-size:13px;">起動確認中...</div>
 <div id="errorBox" style="display:none;background:#ffe5e5;color:#900;border:1px solid #d99;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;"></div>
   <div class="card">
-    <h1>六爻 納爻自動ツール 地支欄整理版</h1>
+    <h1>六爻 納爻自動ツール コイン1爻ずつ版</h1>
     <p class="note">iPhoneでも使用できます。表は横長なので、iPhoneでは横スクロール前提です。黄色セルを入力すると、世応・六神・地支・六親・伏神・空亡・月破・月合・日破・日合・用/元/忌/仇・一部の発動種別を表示します。</p>
   </div>
 
@@ -252,6 +266,22 @@ window.onerror=function(msg, url, line, col, err){
   
 
   
+  
+  <div class="card cast-panel">
+    <div class="cast-controls">
+      <strong>卦爻入力モード</strong>
+      <div class="mode-toggle">
+        <button type="button" id="manualModeBtn">手動入力</button>
+        <button type="button" id="coinModeBtn">コイン投げ</button>
+      </div>
+      <button type="button" class="primary" id="castCoinsBtn">コイン3枚を1爻分投げる</button>
+      <button type="button" id="clearCoinBtn">コイン結果を消す</button>
+      <span class="small">裏0枚=× / 裏1枚=ー / 裏2枚=-- / 裏3枚=○</span>
+    </div>
+    <div id="coinResults" class="coin-results small"></div>
+  </div>
+
+
   <div class="card figure-card" id="figureCard">
     <h2>図1　五行・六親の関係</h2>
     <div id="figureArea" class="figure-area">
@@ -510,7 +540,7 @@ function buildDisplayLines(inputSymbols,cal){
 }
 function uuid(){return safeUuid();}
 function blankRecord(){
-  return {id:uuid(),readingDate:new Date().toISOString().slice(0,10),clientName:"",question:"",useGod:"世爻",genre:"仕事",memo:"",resultMemo:"",calendar:{monthBranch:"",dayStem:"",dayBranch:"",voidBranches:["",""]},inputSymbols:["空","空","空","空","空","空"],lineMemos:["","","","","",""],updatedAt:new Date().toISOString()};
+  return {id:uuid(),readingDate:new Date().toISOString().slice(0,10),clientName:"",question:"",useGod:"世爻",genre:"仕事",memo:"",resultMemo:"",calendar:{monthBranch:"",dayStem:"",dayBranch:"",voidBranches:["",""]},inputSymbols:["空","空","空","空","空","空"],lineMemos:["","","","","",""],inputMode:"manual",coinCasts:[],updatedAt:new Date().toISOString()};
 }
 let record=blankRecord();
 let saved=[];
@@ -710,9 +740,18 @@ function bindInputs(){
   document.getElementById("void2").addEventListener("input",function(e){setVoidPair(e.target.value); render();});
   document.getElementById("saveBtn").onclick=()=>{record.updatedAt=new Date().toISOString(); saved=[cloneObj(record),...saved.filter(r=>r.id!==record.id)]; saveStorage(); renderSaved(); alert("保存しました");};
   document.getElementById("newBtn").onclick=()=>{record=blankRecord(); render();};
-  document.getElementById("resetLinesBtn").onclick=()=>{record.inputSymbols=["空","空","空","空","空","空"]; record.lineMemos=["","","","","",""]; render();};
+  document.getElementById("resetLinesBtn").onclick=()=>{record.inputMode="manual"; record.coinCasts=[]; record.inputSymbols=["空","空","空","空","空","空"]; record.lineMemos=["","","","","",""]; render();};
   document.getElementById("exportBtn").onclick=()=>{const blob=new Blob([JSON.stringify(saved,null,2)],{type:"application/json"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`六爻占例バックアップ_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);};
   document.getElementById("importInput").onchange=e=>{const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{try{const data=JSON.parse(String(reader.result)); if(!Array.isArray(data))throw new Error(); saved=data; saveStorage(); renderSaved(); alert("読み込みました");}catch(err){alert("JSONを読み込めませんでした");}}; reader.readAsText(file);};
+  var manualModeBtn=document.getElementById("manualModeBtn");
+  if(manualModeBtn) manualModeBtn.onclick=function(){record.inputMode="manual"; render();};
+  var coinModeBtn=document.getElementById("coinModeBtn");
+  if(coinModeBtn) coinModeBtn.onclick=function(){record.inputMode="coin"; render();};
+  var castCoinsBtn=document.getElementById("castCoinsBtn");
+  if(castCoinsBtn) castCoinsBtn.onclick=function(){castNextLine(); render();};
+  var clearCoinBtn=document.getElementById("clearCoinBtn");
+  if(clearCoinBtn) clearCoinBtn.onclick=function(){record.coinCasts=[]; if(record.inputMode==="coin") record.inputMode="manual"; render();};
+
 }
 
 const threeHarmonyGroups=[
@@ -851,6 +890,11 @@ function getContinuousGenerationExtras(data, isUseGod, computed, ctx, scoreCtx){
 }
 
 
+function ensureCoinState(){
+  if(!record.inputMode) record.inputMode="manual";
+  if(!record.coinCasts || !Array.isArray(record.coinCasts)) record.coinCasts=[];
+}
+
 function ensureLineMemos(){
   if(!record.lineMemos || !Array.isArray(record.lineMemos)){
     record.lineMemos=["","","","","",""];
@@ -980,7 +1024,74 @@ function renderHexMeanings(mainHex, changedHex){
   el.innerHTML=renderMeaningCard("本卦", mainHex) + (changedHex ? renderMeaningCard("変卦", changedHex) : "");
 }
 
+
+function coinSymbolFromBacks(backCount){
+  if(backCount===0) return "×";
+  if(backCount===1) return "ー";
+  if(backCount===2) return "--";
+  if(backCount===3) return "○";
+  return "空";
+}
+function castOneLine(){
+  var coins=[];
+  var backs=0;
+  for(var i=0;i<3;i++){
+    var isBack=Math.random()<0.5;
+    coins.push(isBack?"裏":"表");
+    if(isBack) backs++;
+  }
+  return {coins:coins, backs:backs, symbol:coinSymbolFromBacks(backs)};
+}
+function castNextLine(){
+  if(!record.coinCasts || !Array.isArray(record.coinCasts)) record.coinCasts=[];
+  if(!record.inputSymbols || !Array.isArray(record.inputSymbols)) record.inputSymbols=["空","空","空","空","空","空"];
+
+  var nextIndex = record.coinCasts.length;
+  if(nextIndex >= 6){
+    return;
+  }
+
+  var c = castOneLine();
+  record.inputMode = "coin";
+  record.coinCasts.push(c);
+  record.inputSymbols[nextIndex] = c.symbol;
+}
+function renderCoinResults(){
+  var el=document.getElementById("coinResults");
+  if(!el) return;
+  var manualBtn=document.getElementById("manualModeBtn");
+  var coinBtn=document.getElementById("coinModeBtn");
+  var castBtn=document.getElementById("castCoinsBtn");
+  if(manualBtn) manualBtn.classList.toggle("active", record.inputMode!=="coin");
+  if(coinBtn) coinBtn.classList.toggle("active", record.inputMode==="coin");
+
+  var count = record.coinCasts && Array.isArray(record.coinCasts) ? record.coinCasts.length : 0;
+  if(castBtn){
+    castBtn.disabled = count >= 6;
+    castBtn.textContent = count >= 6 ? "六爻完成" : "コイン3枚を1爻分投げる";
+  }
+
+  if(!record.coinCasts || !record.coinCasts.length){
+    el.innerHTML='<div class="small">コイン投げモードで「コイン3枚を1爻分投げる」を押すと、初爻から順に1爻ずつ自動入力します。</div>';
+    return;
+  }
+  var labels=["初爻","二爻","三爻","四爻","五爻","上爻"];
+  var html=record.coinCasts.map(function(c,idx){
+    return '<div class="coin-cast">'
+      +'<strong>'+labels[idx]+'</strong>'
+      +'<div class="coin-row">'+c.coins.join(" ")+'</div>'
+      +'<div>裏 '+c.backs+'枚 → <span class="coin-symbol">'+c.symbol+'</span></div>'
+      +'</div>';
+  }).join("");
+  if(count < 6){
+    html += '<div class="coin-cast"><strong>次</strong><div class="small">'+labels[count]+'を投げてください。</div></div>';
+  }else{
+    html += '<div class="coin-cast"><strong>完成</strong><div class="small">六爻すべて出ました。</div></div>';
+  }
+  el.innerHTML=html;
+}
 function renderCore(){
+  ensureCoinState();
   ensureLineMemos();
   ["readingDate","clientName","question","useGod","genre","memo","resultMemo"].forEach(id=>document.getElementById(id).value=record[id]||"");
   document.getElementById("monthBranch").value=record.calendar.monthBranch;
@@ -1051,13 +1162,14 @@ function renderCore(){
     </tr>`;
   }).join("");
   document.getElementById("lineTable").innerHTML=rows;
-  document.querySelectorAll(".line-select").forEach(sel=>sel.addEventListener("change",e=>{record.inputSymbols[Number(e.target.dataset.idx)]=e.target.value; render();}));
+  document.querySelectorAll(".line-select").forEach(sel=>sel.addEventListener("change",e=>{record.inputMode="manual"; record.coinCasts=[]; record.inputSymbols[Number(e.target.dataset.idx)]=e.target.value; render();}));
   document.querySelectorAll(".row-memo").forEach(function(el){el.addEventListener("input",function(e){record.lineMemos[Number(e.target.dataset.memoIdx)]=e.target.value;});});
   document.getElementById("palaceCell").textContent=(computed.mainHex && computed.mainHex.palace)||"";
   document.getElementById("mainHexCell").textContent=computed.mainHex?computed.mainHex.name+(computed.mainHex.tags.length?`（${computed.mainHex.tags.join("・")}）`:""):"";
   document.getElementById("changedHexCell").textContent=computed.changedHex?computed.changedHex.name+(computed.changedHex.tags.length?`（${computed.changedHex.tags.join("・")}）`:""):"";
   renderFigure(computed, useCtx, scoreCtx);
   renderHexMeanings(computed.mainHex, computed.changedHex);
+  renderCoinResults();
   renderSaved();
 }
 function render(){
@@ -1067,7 +1179,7 @@ function render(){
     renderCore();
     if(status){
       status.style.display="block";
-      status.textContent="起動OK：地支欄整理版が読み込まれています";
+      status.textContent="起動OK：コイン1爻ずつ版が読み込まれています";
     }
     if(box){
       box.style.display="none";
